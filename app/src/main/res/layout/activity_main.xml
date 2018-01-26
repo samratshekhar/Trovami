@@ -30,10 +30,12 @@
             tools:context="com.trovami.activities.MainActivity"
             tools:showIn="@layout/activity_main">
 
-            <TextView
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_google"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello World!" />
+                app:colorScheme="dark"
+                app:buttonSize="wide"/>
 
         </RelativeLayout>
 
