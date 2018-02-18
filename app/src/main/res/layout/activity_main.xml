@@ -32,12 +32,49 @@
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_google"
-                android:layout_width="wrap_content"
+                style="@style/AppTheme.NoActionBar"
+                android:layout_width="400px"
                 android:layout_height="wrap_content"
-                app:colorScheme="dark"
-                app:buttonSize="wide"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="95dp"
                 android:onClick="onClickGoogleSignin"
-            />
+                app:buttonSize="wide"
+                app:colorScheme="dark" />
+
+            <Button
+                android:id="@+id/sign_in_facebook"
+
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="400px"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/sign_in_google"
+                android:layout_alignStart="@+id/sign_in_google"
+                android:layout_below="@+id/sign_in_google"
+                android:layout_marginTop="36dp"
+                android:background="@color/colorPrimaryDark"
+                android:elevation="0dp"
+                android:text=" Sign in with Facebook "
+                android:textAlignment="center"
+                android:typeface="normal" />
+
+            <Button
+                android:id="@+id/sign_in_email"
+
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="400px"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/sign_in_facebook"
+                android:layout_alignStart="@+id/sign_in_facebook"
+                android:layout_below="@+id/sign_in_facebook"
+                android:layout_marginTop="36dp"
+                android:elevation="24dp"
+                android:text="SIGN IN WITH EMAIL"
+                android:textAlignment="center"
+                android:typeface="normal" />
+
+
+
 
         </RelativeLayout>
 
