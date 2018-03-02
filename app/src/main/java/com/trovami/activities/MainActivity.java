@@ -61,16 +61,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sign_in_google:
-                this.signinGoogle();
+                this.startHomeActivity();
                 break;
             // ...
         }
     }
 
-    private void signinGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
+    private void startHomeActivity() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
     }
+
+    //private void signinGoogle() {
+
+    //Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+
+    //startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
+
+    //}
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
