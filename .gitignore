@@ -26,6 +26,12 @@ proguard/
 # Log Files
 *.log
 
+# Patch Files
+*.patch
+
+# Shell files
+*.sh
+
 # Android Studio Navigation editor temp files
 .navigation/
 
