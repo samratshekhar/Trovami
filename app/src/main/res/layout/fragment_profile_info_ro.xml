@@ -1,0 +1,47 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.trovami.fragments.ProfileInfoRo">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="67"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tV_name"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:text="Anusha Lihala"
+            android:padding="16dp"
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/tV_email"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:text="anusha.lihala@gmail.com"
+            android:padding="16dp"
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/tV_phone"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:text="8981381234"
+            android:padding="16dp"
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/tV_last_loc"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:text="9th March, 22:00"
+            android:padding="16dp"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+</FrameLayout>
