@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sign_in_google:
-
                 this.startHomeActivity();
                 Toast.makeText(getApplicationContext(),"Logging in with Google", Toast.LENGTH_SHORT).show();
                 break;
@@ -81,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(),"Logging in with Facebook", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.sign_in_email:
+                this.startMapFragment();
                 Toast.makeText(getApplicationContext(),"Logging in with Email", Toast.LENGTH_SHORT).show();
                 break;
             // ...
@@ -92,11 +92,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
+    private void startMapFragment() {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
+
     private void signinGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
 
     }
+
+
 
     //private void signinGoogle() {
 
