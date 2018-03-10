@@ -2,8 +2,9 @@
     <string name="app_name">Trovami</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_home">HomeActivity</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="google_android_map_api_key">AIzaSyAxiIjCx9GqCnPP5PB0mqxUeseWCKTNhNg</string>
+    <string name="facebook_app_id">592165007804780</string>
+    <string name="fb_login_protocol_scheme">fb592165007804780</string>
 </resources>
