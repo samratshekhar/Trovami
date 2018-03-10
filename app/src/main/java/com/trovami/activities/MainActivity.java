@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ActivityMainBinding mBinding;
     private GoogleSignInClient mGoogleSignInClient;
 
-    Button fb_login, email_login;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,15 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setupUI() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-        fb_login = (Button) findViewById(R.id.sign_in_facebook);
-        email_login = (Button) findViewById(R.id.sign_in_email);
-
-        fb_login.setOnClickListener(this);
-        email_login.setOnClickListener(this);
-
         setSupportActionBar(mBinding.toolbar);
         mBinding.signInGoogle.setOnClickListener(this);
+        mBinding.signInFacebook.setOnClickListener(this);
+        mBinding.signInEmail.setOnClickListener(this);
 
     }
 
@@ -73,23 +66,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sign_in_google:
-
-                this.startHomeActivity();
-                Toast.makeText(getApplicationContext(),"Logging in with Google", Toast.LENGTH_SHORT).show();
+                this.signinGoogle();
                 break;
             case R.id.sign_in_facebook:
-                Toast.makeText(getApplicationContext(),"Logging in with Facebook", Toast.LENGTH_SHORT).show();
+                // TODO: handle fb login
                 break;
             case R.id.sign_in_email:
-                Toast.makeText(getApplicationContext(),"Logging in with Email", Toast.LENGTH_SHORT).show();
+                // TODO: handle email login
                 break;
-            // ...
         }
-    }
-
-    private void startHomeActivity() {
-        Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
     }
 
     private void signinGoogle() {
@@ -98,22 +83,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //private void signinGoogle() {
-
-    //Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-
-    //startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
-
-    //}
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_GOOGLE_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
@@ -122,37 +95,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
             // TODO: handle success
             Log.d(TAG, account.getDisplayName());
         } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            // TODO:
+            // TODO: handle error
         }
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }
