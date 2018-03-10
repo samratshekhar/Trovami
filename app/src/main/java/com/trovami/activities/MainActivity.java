@@ -11,6 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,27 +31,24 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.trovami.R;
 import com.trovami.databinding.ActivityMainBinding;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
     private static final int RC_GOOGLE_SIGN_IN = 999;
     private ActivityMainBinding mBinding;
     private GoogleSignInClient mGoogleSignInClient;
+    private CallbackManager mFacebookCallbackManagaer;
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setupUI();
         this.setupFirebaseAuth();
-        if(this.isLoggedId()) {
-            //TODO: show home
-            this.setupUI();
-            this.setupGoogleClient();
-
-        } else {
-            this.setupUI();
-            this.setupGoogleClient();
-        }
+        this.setupGoogleClient();
+        this.setupFacebookClient();
     }
 
     private void setupUI() {
@@ -67,6 +69,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    private void setupFacebookClient() {
+        mFacebookCallbackManagaer = CallbackManager.Factory.create();
+        mBinding.loginButton.setReadPermissions(Arrays.asList("email"));
+        mBinding.loginButton.registerCallback(mFacebookCallbackManagaer, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                Log.d(TAG, "facebook:onSuccess:" + loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "facebook:onCancel");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Log.d(TAG, "facebook:onError", exception);
+            }
+        });
     }
 
     private boolean isLoggedId() {
@@ -99,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        mFacebookCallbackManagaer.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
