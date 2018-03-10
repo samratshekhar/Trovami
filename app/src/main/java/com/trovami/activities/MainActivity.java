@@ -15,6 +15,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.trovami.R;
 import com.trovami.databinding.ActivityMainBinding;
 
@@ -22,13 +24,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MainActivity";
     private static final int RC_GOOGLE_SIGN_IN = 999;
-    ActivityMainBinding mBinding;
+    private ActivityMainBinding mBinding;
     private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.setupFirebaseAuth();
         if(this.isLoggedId()) {
             //TODO: show home
             this.setupUI();
@@ -46,7 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBinding.signInGoogle.setOnClickListener(this);
         mBinding.signInFacebook.setOnClickListener(this);
         mBinding.signInEmail.setOnClickListener(this);
+    }
 
+    private void setupFirebaseAuth() {
+        mAuth = FirebaseAuth.getInstance();
     }
 
     private void setupGoogleClient() {
@@ -57,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isLoggedId() {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) return true;
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) return true;
         return false;
     }
 
