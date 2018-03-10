@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "161560245334-o0cap383oqu718k3ptcj5q622bitd8ds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trovami",
+            "certificate_hash": "a08a5a7828edbf52b2437f670b7158a34b100934"
+          }
+        },
+        {
           "client_id": "161560245334-pmpq06tj6ohiuurf9shei98gkqdslib6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
