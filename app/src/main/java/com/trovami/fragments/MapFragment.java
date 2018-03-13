@@ -41,6 +41,7 @@ import static com.google.android.gms.plus.PlusOneDummyView.TAG;
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    final private int REQ_PERMISSION = 123;
     private MapFragmentListener mListener;
     MapView mMapView;
     GoogleMap map;
@@ -123,29 +124,74 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-       // map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        //map.setTrafficEnabled(true);
-       // map.setIndoorEnabled(true);
-        //map.setBuildingsEnabled(true);
-        //map.getUiSettings().setZoomControlsEnabled(true);
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        map.setTrafficEnabled(true);
+        map.setIndoorEnabled(true);
+        map.setBuildingsEnabled(true);
+        map.getUiSettings().setZoomControlsEnabled(true);
 
         mPerth = map.addMarker(new MarkerOptions()
                 .position(PERTH)
-                .title("Perth"));
+                .title("Perth")
+                .snippet("Swan River"));
         mPerth.setTag(0);
 
         mSydney = map.addMarker(new MarkerOptions()
                 .position(SYDNEY)
-                .title("Sydney"));
+                .title("Sydney")
+                .snippet("Sydney Opera House"));
         mSydney.setTag(0);
 
         mBrisbane = map.addMarker(new MarkerOptions()
                 .position(BRISBANE)
-                .title("Brisbane"));
+                .title("Brisbane")
+                .snippet("Lone Pine Koala Sanctuary"));
         mBrisbane.setTag(0);
+
+        if(checkPermission())
+            map.setMyLocationEnabled(true);
+        else askPermission();
 
         map.setOnMarkerClickListener(this);
 
+    }
+
+    // Check for permission to access Location
+    private boolean checkPermission() {
+        Log.d(TAG, "checkPermission()");
+        // Ask for permission if it wasn't granted yet
+        return (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED );
+    }
+    // Asks for permission
+    private void askPermission() {
+        Log.d(TAG, "askPermission()");
+        ActivityCompat.requestPermissions(
+                getActivity(),
+                new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION },
+                REQ_PERMISSION
+        );
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult()");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch ( requestCode ) {
+            case REQ_PERMISSION: {
+                if ( grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+                    // Permission granted
+                    if(checkPermission())
+                        map.setMyLocationEnabled(true);
+
+                } else {
+                    // Permission denied
+
+                }
+                break;
+            }
+        }
     }
 
     /** Called when the user clicks a marker. */
