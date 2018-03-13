@@ -3,7 +3,10 @@ package com.trovami.fragments;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,31 +23,34 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.trovami.Manifest;
 import com.trovami.R;
 import com.trovami.activities.MainActivity;
 
+import static android.content.Context.LOCATION_SERVICE;
 import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 
 /**
  * Fragment class which contains a mapView
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, LocationListener {
 
     final private int REQ_PERMISSION = 123;
     private MapFragmentListener mListener;
     MapView mMapView;
     GoogleMap map;
+    LatLng myPosition;
 
     private static final LatLng PERTH = new LatLng(-31.952854, 115.857342);
     private static final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
@@ -148,27 +154,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 .snippet("Lone Pine Koala Sanctuary"));
         mBrisbane.setTag(0);
 
-        if(checkPermission())
+        if (checkPermission())
             map.setMyLocationEnabled(true);
         else askPermission();
 
         map.setOnMarkerClickListener(this);
 
+        // Getting LocationManager object from System Service LOCATION_SERVICE
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+
+        // Creating a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
+
+        // Getting the name of the best provider
+        String provider = locationManager.getBestProvider(criteria, true);
+
+        // Getting Current Location
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        if (location != null) {
+            // Getting latitude of the current location
+            double latitude = location.getLatitude();
+
+            // Getting longitude of the current location
+            double longitude = location.getLongitude();
+
+            // Creating a LatLng object for the current location
+            //LatLng latLng = new LatLng(latitude, longitude);
+
+            myPosition = new LatLng(latitude, longitude);
+            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
+
+
+            if(!bounds.contains(myPosition))
+            {
+                //Move the camera to the user's location if they are off-screen!
+                map.animateCamera(CameraUpdateFactory.newLatLng(myPosition));
+            }
+
+            googleMap.addMarker(new MarkerOptions().position(myPosition).title("You are Here!"));
+        }
     }
+
 
     // Check for permission to access Location
     private boolean checkPermission() {
         Log.d(TAG, "checkPermission()");
         // Ask for permission if it wasn't granted yet
         return (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED );
+                == PackageManager.PERMISSION_GRANTED);
     }
+
     // Asks for permission
     private void askPermission() {
         Log.d(TAG, "askPermission()");
         ActivityCompat.requestPermissions(
                 getActivity(),
-                new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION },
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                 REQ_PERMISSION
         );
     }
@@ -177,12 +219,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult()");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch ( requestCode ) {
+        switch (requestCode) {
             case REQ_PERMISSION: {
-                if ( grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted
-                    if(checkPermission())
+                    if (checkPermission())
                         map.setMyLocationEnabled(true);
 
                 } else {
@@ -194,7 +236,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    /** Called when the user clicks a marker. */
+    /**
+     * Called when the user clicks a marker.
+     */
     @Override
     public boolean onMarkerClick(Marker marker) {
        /* // Retrieve the data from the marker.
@@ -216,6 +260,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // for the default behavior to occur (which is for the camera to move such that the
         // marker is centered and for the marker's info window to open, if it has one).
         return false;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 
     public interface MapFragmentListener {
