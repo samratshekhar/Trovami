@@ -23,7 +23,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="133dp"
             android:layout_marginStart="133dp"
-            android:src="@mipmap/profile1"
+            android:src="@mipmap/rose"
             app:civ_border_color="#FF000000"
             app:civ_border_width="2dp" />
     </RelativeLayout>
