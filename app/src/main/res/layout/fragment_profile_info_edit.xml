@@ -1,0 +1,39 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/tV_name"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:text="Anusha Lihala"
+        android:padding="16dp"
+        android:textSize="24sp"/>
+
+    <EditText
+        android:id="@+id/tV_email"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:text="anusha.lihala@gmail.com"
+        android:padding="16dp"
+        android:textSize="24sp"/>
+
+    <EditText
+        android:id="@+id/tV_phone"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:text="8981381234"
+        android:padding="16dp"
+        android:textSize="24sp"/>
+
+    <TextView
+        android:id="@+id/tV_last_loc"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:text="9th March, 22:00"
+        android:padding="16dp"
+        android:textSize="24sp"/>
+</LinearLayout>
+

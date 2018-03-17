@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.trovami.R;
+import com.trovami.fragments.ProfileInfoEdit;
 import com.trovami.fragments.ProfileInfoRo;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -13,7 +14,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        ProfileInfoRo fragment = new ProfileInfoRo();
+        ProfileInfoEdit fragment = new ProfileInfoEdit();
         getSupportFragmentManager().beginTransaction().add(R.id.fl_profile_info, fragment).commit();
     }
 }
