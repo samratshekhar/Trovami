@@ -45,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(isLoggedId()) {
+            loginUser();
+            return;
+        }
         this.setupUI();
         this.setupFirebaseAuth();
         this.setupGoogleClient();
@@ -148,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
-                        // TODO: updateUI(user);
+                        loginUser();
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         Toast.makeText(mainActivity, task.getException().toString(), Toast.LENGTH_LONG).show();
@@ -168,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
-                        // TODO: updateUI(user);
+                        loginUser();
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         Toast.makeText(mainActivity, task.getException().toString(), Toast.LENGTH_LONG).show();
@@ -178,4 +182,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
     }
 
+    private void loginUser() {
+        Intent loginIntent = new Intent(this, HomeActivity.class);
+        startActivity(loginIntent);
+        finish();
+    }
 }
