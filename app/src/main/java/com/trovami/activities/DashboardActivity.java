@@ -12,8 +12,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
+import com.trovami.models.User;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -25,6 +30,32 @@ public class DashboardActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupUI();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        createFirebaseUser();
+
+    }
+
+    private void createFirebaseUser() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        User user = new User();
+        user.email = currentUser.getEmail();
+        user.name = currentUser.getDisplayName();
+        user.photoUrl = currentUser.getPhotoUrl().toString();
+        user.uid = currentUser.getUid();
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        DatabaseReference ref = mDatabase.child("users");
+
+        DatabaseReference cRef = ref.child(currentUser.getUid());
+
+        cRef.setValue(user);
+
     }
 
     private void setupUI() {
