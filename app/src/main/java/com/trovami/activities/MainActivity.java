@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loginUser() {
-        Intent loginIntent = new Intent(this, HomeActivity.class);
+        Intent loginIntent = new Intent(this, DashboardActivity.class);
         startActivity(loginIntent);
         finish();
     }
