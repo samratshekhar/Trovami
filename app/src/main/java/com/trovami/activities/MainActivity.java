@@ -45,12 +45,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setupFirebaseAuth();
         if(isLoggedId()) {
             loginUser();
             return;
         }
         this.setupUI();
-        this.setupFirebaseAuth();
         this.setupGoogleClient();
         this.setupFacebookClient();
     }
