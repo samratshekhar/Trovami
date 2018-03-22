@@ -3,11 +3,6 @@ package com.trovami.fragments;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,7 +29,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -132,13 +126,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMapView.onLowMemory();
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Drawable newDrawable = getResources().getDrawable(R.drawable.mapmarkerflag);
-        Bitmap markerIcon = drawableToBitmap(newDrawable);
-
         map = googleMap;
-        map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         map.setTrafficEnabled(true);
         map.setIndoorEnabled(true);
         map.setBuildingsEnabled(true);
@@ -147,23 +139,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mPerth = map.addMarker(new MarkerOptions()
                 .position(PERTH)
                 .title("Perth")
-                .snippet("Swan River")
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .snippet("Swan River"));
         mPerth.setTag(0);
 
         mSydney = map.addMarker(new MarkerOptions()
                 .position(SYDNEY)
                 .title("Sydney")
-                   .snippet("Sydney Opera House")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+                .snippet("Sydney Opera House"));
         mSydney.setTag(0);
 
         mBrisbane = map.addMarker(new MarkerOptions()
                 .position(BRISBANE)
                 .title("Brisbane")
-                .snippet("Lone Pine Koala Sanctuary")
-                .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)));
+                .snippet("Lone Pine Koala Sanctuary"));
         mBrisbane.setTag(0);
 
         if (checkPermission())
@@ -208,28 +196,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
-        }
-
-        // We ask for the bounds if they have been set as they would be most
-        // correct, then we check we are  > 0
-        final int width = !drawable.getBounds().isEmpty() ?
-                drawable.getBounds().width() : drawable.getIntrinsicWidth();
-
-        final int height = !drawable.getBounds().isEmpty() ?
-                drawable.getBounds().height() : drawable.getIntrinsicHeight();
-
-        // Now we check we are > 0
-        final Bitmap bitmap = Bitmap.createBitmap(width <= 0 ? 1 : width, height <= 0 ? 1 : height,
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
 
     // Check for permission to access Location
     private boolean checkPermission() {
