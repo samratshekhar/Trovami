@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,6 +24,7 @@ import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
+import com.trovami.utils.Utils;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,19 +36,20 @@ public class DashboardActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupUI();
-
-        ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION }, 1);
-        Intent intent = new Intent(this, LocationFetchService.class);
-        startService(intent);
+        if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION }, 1);
+            Intent intent = new Intent(this, LocationFetchService.class);
+            startService(intent);
+        } else {
+            Log.d(TAG, "Service up");
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         createFirebaseUser();
-
-
     }
 
     private void createFirebaseUser() {
@@ -57,15 +60,7 @@ public class DashboardActivity extends AppCompatActivity
         user.name = currentUser.getDisplayName();
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
-
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        DatabaseReference ref = mDatabase.child("users");
-
-        DatabaseReference cRef = ref.child(currentUser.getUid());
-
-        cRef.setValue(user);
-
+        User.setUserById(user, currentUser.getUid());
     }
 
     private void setupUI() {
@@ -92,7 +87,6 @@ public class DashboardActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
