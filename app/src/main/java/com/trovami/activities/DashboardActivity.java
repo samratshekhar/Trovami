@@ -1,10 +1,12 @@
 package com.trovami.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
 import com.trovami.models.User;
+import com.trovami.services.LocationFetchService;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,12 +34,18 @@ public class DashboardActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupUI();
+
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION }, 1);
+        Intent intent = new Intent(this, LocationFetchService.class);
+        startService(intent);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         createFirebaseUser();
+
 
     }
 
