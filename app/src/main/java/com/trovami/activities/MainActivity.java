@@ -1,6 +1,7 @@
 package com.trovami.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CallbackManager mFacebookCallbackManagaer;
     private FirebaseAuth mAuth;
     private AuthCredential fbCredential;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBinding.signInGoogle.setOnClickListener(this);
         mBinding.signInFacebook.setOnClickListener(this);
         mBinding.signInEmail.setOnClickListener(this);
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Logging in...");
+        mDialog.setCancelable(false);
     }
 
     private void setupFirebaseAuth() {
@@ -150,12 +155,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        mDialog.show();
         final Activity mainActivity = this;
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    mDialog.dismiss();
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
                         loginUser();
@@ -173,12 +180,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void firebaseAuthWithFacebook(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
+        mDialog.show();
         final Activity mainActivity = this;
         fbCredential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(fbCredential)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    mDialog.dismiss();
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
                         loginUser();
