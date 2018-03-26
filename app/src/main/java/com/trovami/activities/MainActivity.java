@@ -14,6 +14,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,6 +27,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.trovami.R;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mFacebookCallbackManagaer;
     private FirebaseAuth mAuth;
+    private AuthCredential fbCredential;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +76,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient.signOut();
     }
 
     private void setupFacebookClient() {
+        fbCredential = null;
         mFacebookCallbackManagaer = CallbackManager.Factory.create();
-        mBinding.loginButton.setReadPermissions(Arrays.asList("email"));
+        LoginManager.getInstance().logOut();
+        mBinding.loginButton.setReadPermissions(Arrays.asList("email", "public_profile"));
         mBinding.loginButton.registerCallback(mFacebookCallbackManagaer, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -153,9 +159,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
                         loginUser();
+                        if (fbCredential != null) {
+                            mAuth.getCurrentUser().linkWithCredential(fbCredential);
+                        }
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(mainActivity, task.getException().toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mainActivity, task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -165,17 +174,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void firebaseAuthWithFacebook(AccessToken token) {
         Log.d(TAG, "handleFacebookAccessToken:" + token);
         final Activity mainActivity = this;
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
+        fbCredential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(fbCredential)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "signInWithCredential:success");
                         loginUser();
+                        fbCredential = null;
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(mainActivity, task.getException().toString(), Toast.LENGTH_LONG).show();
+                        if(task.getException().getClass().equals(FirebaseAuthUserCollisionException.class)){
+                            Toast.makeText(mainActivity, "Already logged in with Google. Please login with google (without logging out of FB)to link accounts.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(mainActivity, task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                            fbCredential = null;
+                        }
                     }
                 }
             }
