@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,6 +21,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.models.LatLong;
+
+import java.util.Date;
 
 
 public class LocationFetchService extends Service {
@@ -46,9 +49,13 @@ public class LocationFetchService extends Service {
             mLastLocation.set(location);
 
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            String timeStamp = DateFormat.format("yyyy-MM-dd hh:mm:ss", new Date().getTime()).toString();
+
             LatLong loc = new LatLong();
             loc.lat = location.getLatitude();
             loc.lon = location.getLongitude();
+            loc.timeStamp = timeStamp;
+
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid()).child("latLong");
             ref.setValue(loc);
         }
