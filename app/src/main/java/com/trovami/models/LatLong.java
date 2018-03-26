@@ -8,6 +8,7 @@ public class LatLong {
 
     public double lat;
     public double lon;
+    public String timeStamp;
 
     public LatLong() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
