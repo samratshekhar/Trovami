@@ -28,6 +28,7 @@ proguard/
 
 # Patch Files
 *.patch
+*.diff
 
 # Shell files
 *.sh

@@ -26,8 +26,7 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 
 import com.trovami.R;
 
-public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends AppCompatActivity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
@@ -101,23 +100,6 @@ public class HomeActivity extends AppCompatActivity
 
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -125,46 +107,10 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            getWindow().getDecorView().setBackgroundColor(Color.WHITE);
-            Toast.makeText(getApplicationContext(),"Tab1", Toast.LENGTH_LONG).show();
-
-        } else if (id == R.id.nav_gallery) {
-            getWindow().getDecorView().setBackgroundColor(Color.BLUE);
-            Toast.makeText(getApplicationContext(),"Tab2", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_slideshow) {
-            getWindow().getDecorView().setBackgroundColor(Color.MAGENTA);
-            Toast.makeText(getApplicationContext(),"Tab3", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_manage) {
-            getWindow().getDecorView().setBackgroundColor(Color.YELLOW);
-            Toast.makeText(getApplicationContext(),"Tab4", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_share) {
-            getWindow().getDecorView().setBackgroundColor(Color.CYAN);
-            Toast.makeText(getApplicationContext(),"Tab5", Toast.LENGTH_SHORT).show();
-
-        } else if (id == R.id.nav_send) {
-            getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-            Toast.makeText(getApplicationContext(),"Tab6", Toast.LENGTH_SHORT).show();
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }
