@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/tV_name"
+        android:id="@+id/eT_name"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:text="Anusha Lihala"
@@ -13,7 +13,7 @@
         android:textSize="24sp"/>
 
     <EditText
-        android:id="@+id/tV_email"
+        android:id="@+id/eT_email"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:text="anusha.lihala@gmail.com"
@@ -21,7 +21,7 @@
         android:textSize="24sp"/>
 
     <EditText
-        android:id="@+id/tV_phone"
+        android:id="@+id/eT_phone"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:text="8981381234"
@@ -29,7 +29,7 @@
         android:textSize="24sp"/>
 
     <TextView
-        android:id="@+id/tV_last_loc"
+        android:id="@+id/tV_last_update_time"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:text="9th March, 22:00"
