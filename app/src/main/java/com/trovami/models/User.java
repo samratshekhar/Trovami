@@ -45,5 +45,12 @@ public class User {
         phoneQuery.addListenerForSingleValueEvent(listener);
         return;
     }
+
+    public static void getUsers(ValueEventListener listener) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference ref = database.child("users");
+        Query phoneQuery = ref.orderByChild(RDBSchema.Users.UID);
+        phoneQuery.addListenerForSingleValueEvent(listener);
+        return;
     }
 }
