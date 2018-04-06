@@ -38,23 +38,12 @@ public class User {
         return null;
     }
 
-    public static User getUserById(String uid) {
+    public static void getUserById(String uid, ValueEventListener listener) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = database.child("users").child(uid);
-
+        DatabaseReference ref = database.child("users");
         Query phoneQuery = ref.orderByChild(RDBSchema.Users.UID).equalTo(uid);
-        phoneQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                    User user = singleSnapshot.getValue(User.class);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e(TAG, "onCancelled", databaseError.toException());
-            }
-        });
-        return null;
+        phoneQuery.addListenerForSingleValueEvent(listener);
+        return;
+    }
     }
 }
