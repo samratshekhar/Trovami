@@ -103,7 +103,6 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void createFirebaseUser() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
