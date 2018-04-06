@@ -52,7 +52,38 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        createFirebaseUser();
+        fetchCurrentUser();
+    }
+
+    private void setupFirebaseAuth() {
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void fetchCurrentUser() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        final DashboardActivity activity = this;
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if(iterator.hasNext()) {
+                    // user found, fetch followers and following
+                    DataSnapshot singleSnapshot = iterator.next();
+                    User user = singleSnapshot.getValue(User.class);
+                    activity.fetchFollowing(user.following);
+                } else {
+                    // user not found, create one
+                    activity.createFirebaseUser();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "onCancelled", databaseError.toException());
+                // TODO: handle error
+            }
+        };
+        User.getUserById(currentUser.getUid(), listener);
+    }
     }
 
     private void createFirebaseUser() {
