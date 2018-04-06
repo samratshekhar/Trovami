@@ -1,17 +1,21 @@
 package com.trovami.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by samrat on 12/03/18.
  */
 
-public class User {
+public class User implements Parcelable {
     public static final String TAG = "UserModel";
     public String uid;
     public String name;
@@ -48,4 +52,67 @@ public class User {
         phoneQuery.addListenerForSingleValueEvent(listener);
         return;
     }
+
+    protected User(Parcel in) {
+        uid = in.readString();
+        name = in.readString();
+        email = in.readString();
+        phone = in.readString();
+        gender = in.readString();
+        photoUrl = in.readString();
+        latLong = (LatLong) in.readValue(LatLong.class.getClassLoader());
+        if (in.readByte() == 0x01) {
+            follower = new ArrayList<String>();
+            in.readList(follower, String.class.getClassLoader());
+        } else {
+            follower = null;
+        }
+        if (in.readByte() == 0x01) {
+            following = new ArrayList<String>();
+            in.readList(following, String.class.getClassLoader());
+        } else {
+            following = null;
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uid);
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(phone);
+        dest.writeString(gender);
+        dest.writeString(photoUrl);
+        dest.writeValue(latLong);
+        if (follower == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(follower);
+        }
+        if (following == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(following);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
