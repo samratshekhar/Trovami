@@ -1,10 +1,5 @@
 package com.trovami.models;
 
-import android.net.Uri;
-import android.util.Log;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -31,11 +26,11 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public static User setUserById(User user, String uid) {
+    public static void setUserById(User user, String uid) {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         DatabaseReference ref = mDatabase.child("users").child(uid);
         ref.setValue(user);
-        return null;
+        return;
     }
 
     public static void getUserById(String uid, ValueEventListener listener) {
