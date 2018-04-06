@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.trovami.Manifest;
 import com.trovami.R;
 import com.trovami.activities.MainActivity;
+import com.trovami.models.User;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static com.google.android.gms.plus.PlusOneDummyView.TAG;
@@ -58,10 +59,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     GoogleMap map;
     LatLng myPosition;
 
+    private User user;
+
+    private LatLng loc = (user.latLong);
     private static final LatLng PERTH = new LatLng(-31.952854, 115.857342);
     private static final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
     private static final LatLng BRISBANE = new LatLng(-27.47093, 153.0235);
 
+    private Marker mloc;
     private Marker mPerth;
     private Marker mSydney;
     private Marker mBrisbane;
@@ -143,6 +148,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setIndoorEnabled(true);
         map.setBuildingsEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
+
+        mloc = map.addMarker(new MarkerOptions()
+                .position(loc)
+                .title("User")
+                .snippet("HEre")
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        mloc.setTag(0);
 
         mPerth = map.addMarker(new MarkerOptions()
                 .position(PERTH)
