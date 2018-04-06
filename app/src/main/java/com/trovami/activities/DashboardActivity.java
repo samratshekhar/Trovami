@@ -84,6 +84,22 @@ public class DashboardActivity extends AppCompatActivity
         };
         User.getUserById(currentUser.getUid(), listener);
     }
+
+    private void fetchFollowing(List<String> following) {
+        User.getUsers(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
+                    User user = singleSnapshot.getValue(User.class);
+                    Log.d(TAG, "lat: "+user.latLong.lat);
+                    Log.d(TAG, "lon: "+user.latLong.lon);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // TODO: handle error
+            }
+        });
     }
 
     private void createFirebaseUser() {
