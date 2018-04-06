@@ -4,38 +4,41 @@ import android.Manifest;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
 import com.trovami.utils.Utils;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "DashboardActivity";
     private ActivityDashboardBinding mBinding;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupUI();
+        this.setupUI();
+        this.setupFirebaseAuth();
         if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION }, 1);
