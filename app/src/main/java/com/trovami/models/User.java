@@ -10,6 +10,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 /**
  * Created by samrat on 12/03/18.
  */
@@ -19,8 +21,12 @@ public class User {
     public String uid;
     public String name;
     public String email;
+    public String phone;
+    public String gender;
     public String photoUrl;
-    public  LatLong latLong;
+    public LatLong latLong;
+    public List<String> follower;
+    public List<String> following;
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
