@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,30 @@ public class HomeActivity extends AppCompatActivity {
 
         // setting list adapter
         expListView.setAdapter(listAdapter);
+
+        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener(){
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                final String str = "Group: " + String.valueOf(groupPosition) + " and Child: " + String.valueOf(childPosition);
+                Toast.makeText(getApplicationContext(),
+                                str,
+                                Toast.LENGTH_SHORT).show();
+
+                Button btn = v.findViewById(R.id.btn_listbtn);
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),
+                                "Button: " + str,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                return true;
+            }
+        });
+
     }
 
      /*
@@ -102,7 +127,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
 
-
+        Toast.makeText(getApplicationContext(),"hello",Toast.LENGTH_SHORT).show();
         return super.onOptionsItemSelected(item);
     }
 
