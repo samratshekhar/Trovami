@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,9 +18,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.activities.DashboardActivity;
+import com.trovami.adapters.HomeExpandableAdapter;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,9 +37,14 @@ public class HomeFragment extends Fragment {
 
     private HomeFragmentListener mListener;
     private FirebaseAuth mAuth;
+
+    private ProgressDialog mDialog;
+    private HomeExpandableAdapter mHomeExpandableAdapter;
+    private ExpandableListView mExpandableListView;
+
     private List<User> mFollowings;
     private List<User> mFollowers;
-    private ProgressDialog mDialog;
+    private HashMap<String, List<String>> userIdMap = new HashMap<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -65,7 +74,11 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
+        List<String> headers = Arrays.asList("Follower","Following");
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap);
+        mExpandableListView = v.findViewById(R.id.expandable_list_view);
+        mExpandableListView.setAdapter(mHomeExpandableAdapter);
         return v;
     }
 
@@ -84,11 +97,16 @@ public class HomeFragment extends Fragment {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     User user = singleSnapshot.getValue(User.class);
-                    fragment.fetchFollowLists(user.following, user.follower);
+//                    fragment.fetchFollowLists(user.following, user.follower);
+                    userIdMap.put("Follower", user.follower);
+                    userIdMap.put("Following", user.following);
+                    mHomeExpandableAdapter.notifyDataSetChanged();
+
                 } else {
                     // user not found, create one
                     fragment.createFirebaseUser();
                 }
+                mDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {

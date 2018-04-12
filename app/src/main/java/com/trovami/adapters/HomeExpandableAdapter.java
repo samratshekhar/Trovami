@@ -1,4 +1,4 @@
-package com.trovami.activities;
+package com.trovami.adapters;
 
 /**
  * Created by TULIKA on 05-Mar-18.
@@ -25,15 +25,15 @@ import com.trovami.models.ListItem;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ExpandableListAdapter extends BaseExpandableListAdapter {
+public class HomeExpandableAdapter extends BaseExpandableListAdapter {
 
         private Context _context;
         private List<String> _listDataHeader; // header titles
         // child data in format of header title, child title
-        private HashMap<String, List<ListItem>> _listDataChild;
+        private HashMap<String, List<String>> _listDataChild;
 
-        public ExpandableListAdapter(Context context, List<String> listDataHeader,
-                                     HashMap<String, List<ListItem>> listChildData) {
+        public HomeExpandableAdapter(Context context, List<String> listDataHeader,
+                                     HashMap<String, List<String>> listChildData) {
             this._context = context;
             this._listDataHeader = listDataHeader;
             this._listDataChild = listChildData;
@@ -54,10 +54,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         public View getChildView(int groupPosition, final int childPosition,
                                  boolean isLastChild, View convertView, ViewGroup parent) {
 
-            final ListItem list_item = (ListItem)getChild(groupPosition, childPosition);
-            final String photo_url = list_item.getPhotoUrl();
-            final String title = list_item.getTitle();
-            final String subtitle = list_item.getSubtitle();
+            final String list_item = (String)getChild(groupPosition, childPosition);
+//            final String photo_url = list_item.getPhotoUrl();
+//            final String title = list_item;
+//            final String subtitle = list_item.getSubtitle();
 
             if (convertView == null) {
                 LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -89,8 +89,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             //TODO: set image in CircleImageView
             //imgListPhoto.setImageDrawable();
 
-            txtListTitle.setText(title);
-            txtListSubtitle.setText(subtitle);
+            txtListTitle.setText(list_item);
+//            txtListSubtitle.setText(subtitle);
 
             return convertView;
         }
