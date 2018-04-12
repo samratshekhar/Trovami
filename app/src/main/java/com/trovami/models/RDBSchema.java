@@ -24,4 +24,20 @@ public class RDBSchema {
         public static final String LONG = "long";
         public static final String TIME_STAMP = "timeStamp";
     }
+
+    public class Notification {
+        public static final String TABLE_NAME = "notifications";
+        public static final String UID = "uid";
+        public static final String FROM = "from";
+        public static final String TO = "to";
+        public static final String STATUS = "status";
+    }
+
+    public class NotificationReq {
+        public static final String FROM = "from";
+        public static final String TO = "to";
+        public static final String STATUS = "status";
+        public static final String NAME = "name";
+        public static final String PHOTO_URL = "photoUrl";
+    }
 }
