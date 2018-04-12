@@ -65,23 +65,17 @@ public class HomeExpandableAdapter extends BaseExpandableListAdapter {
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
         final String list_item = (String)getChild(groupPosition, childPosition);
-//            final String photo_url = list_item.getPhotoUrl();
-//            final String title = list_item;
-//            final String subtitle = list_item.getSubtitle();
-
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.list_item, null);
         }
-
         final TextView txtListTitle = (TextView) convertView
                 .findViewById(R.id.tV_ListTitle);
         TextView txtListSubtitle = (TextView) convertView
                 .findViewById(R.id.tV_ListSubtitle);
         ImageView imgListPhoto = (CircleImageView) convertView
                 .findViewById(R.id.cImg_ListPhoto);
-
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -93,6 +87,8 @@ public class HomeExpandableAdapter extends BaseExpandableListAdapter {
 //                    fragment.fetchFollowLists(user.following, user.follower);
                     userMap.put(list_item, user);
                     txtListTitle.setText(user.name);
+                } else {
+                    txtListTitle.setText(null);
                 }
             }
             @Override
@@ -101,6 +97,7 @@ public class HomeExpandableAdapter extends BaseExpandableListAdapter {
             }
         };
         User.getUserById(list_item, listener);
+        txtListSubtitle.setText(list_item);
         return convertView;
     }
 
