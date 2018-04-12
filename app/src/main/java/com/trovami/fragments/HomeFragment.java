@@ -42,8 +42,7 @@ public class HomeFragment extends Fragment {
     private HomeExpandableAdapter mHomeExpandableAdapter;
     private ExpandableListView mExpandableListView;
 
-    private List<User> mFollowings;
-    private List<User> mFollowers;
+    private HashMap<String, User> userMap = new HashMap<>();
     private HashMap<String, List<String>> userIdMap = new HashMap<>();
 
     public HomeFragment() {
@@ -76,7 +75,7 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         List<String> headers = Arrays.asList("Follower","Following");
         View v = inflater.inflate(R.layout.fragment_home, container, false);
-        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap);
+        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap, userMap);
         mExpandableListView = v.findViewById(R.id.expandable_list_view);
         mExpandableListView.setAdapter(mHomeExpandableAdapter);
         return v;
@@ -115,36 +114,6 @@ public class HomeFragment extends Fragment {
             }
         };
         User.getUserById(currentUser.getUid(), listener);
-    }
-
-    private void fetchFollowLists(final List<String> following, final List<String> follower) {
-        User.getUsers(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                    User user = singleSnapshot.getValue(User.class);
-                    if(following.contains(user.uid)) {
-                        if (mFollowings == null) {
-                            mFollowings = new ArrayList<User>();
-                        }
-                        mFollowings.add(user);
-                    }
-                    else  if (follower.contains(user.uid)) {
-                        if (mFollowers == null) {
-                            mFollowers = new ArrayList<User>();
-                        }
-                        mFollowers.add(user);
-                    }
-                }
-                // TODO: update adapter here;
-                mDialog.dismiss();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
-                mDialog.dismiss();
-            }
-        });
     }
 
     private void createFirebaseUser() {
