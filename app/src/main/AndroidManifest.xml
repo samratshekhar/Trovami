@@ -41,7 +41,7 @@
         </activity>
         <activity
             android:name=".activities.NotificationActivity"
-            android:label="Follow Request Notifications">
+            android:label="Trovami">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
