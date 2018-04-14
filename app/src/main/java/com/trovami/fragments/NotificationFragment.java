@@ -21,18 +21,19 @@ import com.trovami.R;
 import com.trovami.models.Notification;
 import com.trovami.models.NotificationReq;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class NotificationFragment extends Fragment {
 
     private static final String TAG = "NotificationFragment";
 
-    private NotificationFragmentInteractionListener mListener;
+    private NotificationFragmentListener mListener;
     private FirebaseAuth mAuth;
     private List<NotificationReq> mSentReq = new ArrayList<>();
     private List<NotificationReq> mReceivedReq = new ArrayList<>();
     private ProgressDialog mDialog;
-
-    private RecyclerView mRecyclerView;
-    private NotificationsAdapter mAdapter;
 
     public NotificationFragment() {
         // Required empty public constructor
@@ -71,7 +72,6 @@ public class NotificationFragment extends Fragment {
 
     private void fetchNotifications() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final NotificationFragment fragment = this;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -82,7 +82,8 @@ public class NotificationFragment extends Fragment {
                     Notification notification = singleSnapshot.getValue(Notification.class);
                     mSentReq.addAll(notification.to);
                     mReceivedReq = notification.from;
-                    //fragment.fetchFollowLists(user.following, user.follower);
+                } else {
+                    //TODO: handle no notifications here
                 }
                 mDialog.dismiss();
             }
@@ -99,8 +100,8 @@ public class NotificationFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d(TAG, "onAttach");
-        if (context instanceof NotificationFragmentInteractionListener) {
-            mListener = (NotificationFragmentInteractionListener) context;
+        if (context instanceof NotificationFragmentListener) {
+            mListener = (NotificationFragmentListener) context;
         } else {
             Log.e(TAG, context.toString()
                     + " must implement NotificationFragmentInteractionListener");
@@ -114,7 +115,7 @@ public class NotificationFragment extends Fragment {
         mListener = null;
     }
 
-    public interface NotificationFragmentInteractionListener {
+    public interface NotificationFragmentListener {
         // TODO: expose listeners
     }
 }
