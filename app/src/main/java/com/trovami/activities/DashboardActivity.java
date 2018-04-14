@@ -27,6 +27,7 @@ import com.trovami.databinding.ActivityDashboardBinding;
 import com.trovami.fragments.HomeFragment;
 import com.trovami.fragments.MapFragment;
 import com.trovami.fragments.NotificationFragment;
+import com.trovami.fragments.UserFragment;
 import com.trovami.models.Notification;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
@@ -44,6 +45,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private HomeFragment mHomeFragment;
     private NotificationFragment mNotificationFragment;
+    private UserFragment mUserFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +109,10 @@ public class DashboardActivity extends AppCompatActivity
             }
             fragment = mNotificationFragment;
         } else if (id == R.id.nav_add_user) {
-
+            if (mUserFragment == null) {
+                mUserFragment = UserFragment.newInstance();
+            }
+            fragment = mUserFragment;
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_logout) {
