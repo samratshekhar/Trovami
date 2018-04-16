@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Trovami.iml" filepath="$PROJECT_DIR$/Trovami.iml" />
       <module fileurl="file://C:\Users\KUNTALA SETT\proj_Github\project2018\Trovami.iml" filepath="C:\Users\KUNTALA SETT\proj_Github\project2018\Trovami.iml" />
       <module fileurl="file://C:\Users\anush\Documents\GitHub\project2018\Trovami.iml" filepath="C:\Users\anush\Documents\GitHub\project2018\Trovami.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />

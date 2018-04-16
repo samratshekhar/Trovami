@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.activities.DashboardActivity;
 import com.trovami.adapters.HomeExpandableAdapter;
+import com.trovami.adapters.HomeRecycleExpandableAdapater;
+import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
@@ -40,7 +44,9 @@ public class HomeFragment extends Fragment {
 
     private ProgressDialog mDialog;
     private HomeExpandableAdapter mHomeExpandableAdapter;
+    //private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
     private ExpandableListView mExpandableListView;
+    //private RecyclerView mRecyclerView;
 
     private HashMap<String, User> userMap = new HashMap<>();
     private HashMap<String, List<String>> userIdMap = new HashMap<>();
@@ -75,9 +81,23 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         List<String> headers = Arrays.asList("Follower","Following");
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+
         mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap, userMap);
         mExpandableListView = v.findViewById(R.id.expandable_list_view);
         mExpandableListView.setAdapter(mHomeExpandableAdapter);
+
+        /*
+        HomeGroup following = new HomeGroup("Following",Arrays.asList("a1","a2","a3"));
+        HomeGroup followers = new HomeGroup("Followers",Arrays.asList("b1","b2","b3"));
+        HomeGroup favs = new HomeGroup("Favourites",Arrays.asList("f1","f2","f3"));
+        List<HomeGroup> grouplist = Arrays.asList(following,followers,favs);
+
+        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),grouplist);
+        mRecyclerView= v.findViewById(R.id.recyclerView_home);
+        mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        */
+
         return v;
     }
 
@@ -99,6 +119,7 @@ public class HomeFragment extends Fragment {
 //                    fragment.fetchFollowLists(user.following, user.follower);
                     userIdMap.put("Follower", user.follower);
                     userIdMap.put("Following", user.following);
+
                     mHomeExpandableAdapter.notifyDataSetChanged();
 
                 } else {
