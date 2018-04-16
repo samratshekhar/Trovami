@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment {
 
     private HashMap<String, User> userMap = new HashMap<>();
     private HashMap<String, List<String>> userIdMap = new HashMap<>();
+    private List<HomeGroup> mGrouplist = new ArrayList<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -87,12 +88,11 @@ public class HomeFragment extends Fragment {
 //        mExpandableListView.setAdapter(mHomeExpandableAdapter);
 
 
-        HomeGroup following = new HomeGroup("Following",Arrays.asList("a1","a2","a3"));
-        HomeGroup followers = new HomeGroup("Followers",Arrays.asList("b1","b2","b3"));
-        HomeGroup favs = new HomeGroup("Favourites",Arrays.asList("f1","f2","f3"));
-        List<HomeGroup> grouplist = Arrays.asList(following,followers,favs);
+        mGrouplist.add(new HomeGroup("Following",new ArrayList<String>()));
+        mGrouplist.add(new HomeGroup("Followers",new ArrayList<String>()));
 
-        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),grouplist);
+
+        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist);
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -117,8 +117,12 @@ public class HomeFragment extends Fragment {
                     DataSnapshot singleSnapshot = iterator.next();
                     User user = singleSnapshot.getValue(User.class);
 //                    fragment.fetchFollowLists(user.following, user.follower);
-                    userIdMap.put("Follower", user.follower);
-                    userIdMap.put("Following", user.following);
+//                    userIdMap.put("Follower", user.follower);
+//                    userIdMap.put("Following", user.following);
+                    mGrouplist.get(0).getChildList().addAll(user.following);
+                    mGrouplist.get(1).getChildList().addAll(user.follower);
+                    mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
+
 
                     //mHomeExpandableAdapter.notifyDataSetChanged();
 
