@@ -43,10 +43,10 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     private ProgressDialog mDialog;
-    private HomeExpandableAdapter mHomeExpandableAdapter;
-    //private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
-    private ExpandableListView mExpandableListView;
-    //private RecyclerView mRecyclerView;
+    //private HomeExpandableAdapter mHomeExpandableAdapter;
+    private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
+    // private ExpandableListView mExpandableListView;
+    private RecyclerView mRecyclerView;
 
     private HashMap<String, User> userMap = new HashMap<>();
     private HashMap<String, List<String>> userIdMap = new HashMap<>();
@@ -82,11 +82,11 @@ public class HomeFragment extends Fragment {
         List<String> headers = Arrays.asList("Follower","Following");
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap, userMap);
-        mExpandableListView = v.findViewById(R.id.expandable_list_view);
-        mExpandableListView.setAdapter(mHomeExpandableAdapter);
+//        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap, userMap);
+//        mExpandableListView = v.findViewById(R.id.expandable_list_view);
+//        mExpandableListView.setAdapter(mHomeExpandableAdapter);
 
-        /*
+
         HomeGroup following = new HomeGroup("Following",Arrays.asList("a1","a2","a3"));
         HomeGroup followers = new HomeGroup("Followers",Arrays.asList("b1","b2","b3"));
         HomeGroup favs = new HomeGroup("Favourites",Arrays.asList("f1","f2","f3"));
@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment {
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        */
+
 
         return v;
     }
@@ -120,7 +120,7 @@ public class HomeFragment extends Fragment {
                     userIdMap.put("Follower", user.follower);
                     userIdMap.put("Following", user.following);
 
-                    mHomeExpandableAdapter.notifyDataSetChanged();
+                    //mHomeExpandableAdapter.notifyDataSetChanged();
 
                 } else {
                     // user not found, create one
