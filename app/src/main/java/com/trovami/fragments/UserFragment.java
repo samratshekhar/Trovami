@@ -87,12 +87,12 @@ public class UserFragment extends Fragment {
                 mUnfolllowedUsers = new ArrayList<>();
                 for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
                     User user = singleSnapshot.getValue(User.class);
-                    if(!mCurrentUser.following.contains(user.uid) && mCurrentUser.uid != user.uid) {
-                        mUnfolllowedUsers.add(user);
-                    }
+//                    if(!mCurrentUser.following.contains(user.uid) && mCurrentUser.uid != user.uid) {
+ //                       mUnfolllowedUsers.add(user);
+ //                   }
                 }
                 // TODO: update adapter here;
-                mAdapter.notifyDataSetChanged();
+          //      mAdapter.notifyDataSetChanged();
                 mDialog.dismiss();
             }
             @Override
