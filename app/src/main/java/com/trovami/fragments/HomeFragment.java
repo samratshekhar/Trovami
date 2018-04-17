@@ -119,9 +119,9 @@ public class HomeFragment extends Fragment {
 //                    fragment.fetchFollowLists(user.following, user.follower);
 //                    userIdMap.put("Follower", user.follower);
 //                    userIdMap.put("Following", user.following);
-                    mGrouplist.get(0).getChildList().addAll(user.following);
-                    mGrouplist.get(1).getChildList().addAll(user.follower);
-                    mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
+                    //mGrouplist.get(0).getChildList().addAll(user.following);
+                    //mGrouplist.get(1).getChildList().addAll(user.follower);
+                    //mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
 
 
                     //mHomeExpandableAdapter.notifyDataSetChanged();
