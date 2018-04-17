@@ -54,10 +54,7 @@ public class UserFragment extends Fragment {
         mDialog.show();
         setupFirebaseAuth();
         fetchCurrentUser();
-        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
-        UserAdapter mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
     }
 
     private void fetchCurrentUser() {
@@ -112,6 +109,10 @@ public class UserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user, container, false);
+        RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
+        mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return v;
     }
 
