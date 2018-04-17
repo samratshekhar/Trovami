@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +18,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
-import com.trovami.models.Notification;
-import com.trovami.models.NotificationReq;
+import com.trovami.adapters.UserAdapter;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
@@ -30,8 +31,9 @@ public class UserFragment extends Fragment {
     private UserFragmentListener mListener;
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
-    private List<User> mUnfolllowedUsers;
+    private List<User> mUnfolllowedUsers = new ArrayList<>();
     private User mCurrentUser;
+    private UserAdapter mAdapter;
 
     public UserFragment() {
         // Required empty public constructor
@@ -52,6 +54,10 @@ public class UserFragment extends Fragment {
         mDialog.show();
         setupFirebaseAuth();
         fetchCurrentUser();
+        RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
+        UserAdapter mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void fetchCurrentUser() {
@@ -89,6 +95,7 @@ public class UserFragment extends Fragment {
                     }
                 }
                 // TODO: update adapter here;
+                mAdapter.notifyDataSetChanged();
                 mDialog.dismiss();
             }
             @Override
