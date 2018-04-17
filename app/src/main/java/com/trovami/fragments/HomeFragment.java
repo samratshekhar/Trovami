@@ -116,16 +116,13 @@ public class HomeFragment extends Fragment {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     User user = singleSnapshot.getValue(User.class);
-//                    fragment.fetchFollowLists(user.following, user.follower);
-//                    userIdMap.put("Follower", user.follower);
-//                    userIdMap.put("Following", user.following);
-                    //mGrouplist.get(0).getChildList().addAll(user.following);
-                    //mGrouplist.get(1).getChildList().addAll(user.follower);
-                    //mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
-
-
-                    //mHomeExpandableAdapter.notifyDataSetChanged();
-
+                    if (user.following != null) {
+                        mGrouplist.get(0).getChildList().addAll(user.following);
+                    }
+                    if (user.follower != null) {
+                        mGrouplist.get(1).getChildList().addAll(user.follower);
+                    }
+                    mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
                 } else {
                     // user not found, create one
                     fragment.createFirebaseUser();
