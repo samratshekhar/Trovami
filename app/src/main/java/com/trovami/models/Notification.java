@@ -18,8 +18,8 @@ import java.util.List;
 public class Notification implements Parcelable {
     public static final String TAG = "NotificationModel";
     public String uid;
-    public HashMap<String, NotificationReq> from;
-    public HashMap<String, NotificationReq> to;
+    public HashMap<String, String> from;
+    public HashMap<String, String> to;
     public Notification() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
