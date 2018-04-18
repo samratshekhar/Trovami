@@ -23,6 +23,7 @@ import com.trovami.models.User;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class UserFragment extends Fragment {
     private static final String TAG = "UserFragment";
@@ -67,11 +68,17 @@ public class UserFragment extends Fragment {
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
 
-                    Iterator<NotificationReq> sentReqIterator = notification.to.iterator();
-                    while (sentReqIterator.hasNext()) {
-                        NotificationReq sentReq = sentReqIterator.next();
+                    for (Map.Entry<String, NotificationReq> entry : notification.to.entrySet())
+                    {
+                        System.out.println(entry.getKey() + "/" + entry.getValue());
+                        NotificationReq sentReq = entry.getValue();
                         mSentReq.add(sentReq.to);
                     }
+
+//                    Iterator<NotificationReq> sentReqIterator = notification.to.iterator();
+//                    while (sentReqIterator.hasNext()) {
+//
+//                    }
                 } else {
                     //TODO: handle no notifications here
                 }
@@ -141,6 +148,11 @@ public class UserFragment extends Fragment {
         boolean isCurrentUser = mCurrentUser.uid.equals(uid);
         if (isAlreadyFollowing || isReqSent || isCurrentUser) return false;
         return true;
+    }
+
+    private void generateFollowReq(User user) {
+        // TODO: add notification entry for current user (to)
+        // TODO: add notification entry for end user(from)
     }
 
     @Override

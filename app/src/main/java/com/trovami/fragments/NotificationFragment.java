@@ -24,6 +24,7 @@ import com.trovami.models.NotificationReq;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationFragment extends Fragment {
 
@@ -80,8 +81,12 @@ public class NotificationFragment extends Fragment {
                     // notifications found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
-                    mSentReq.addAll(notification.to);
-                    mReceivedReq = notification.from;
+                    for(Map.Entry<String,NotificationReq> map : notification.to.entrySet()){
+                        mSentReq.add(map.getValue());
+                    }
+                    for(Map.Entry<String,NotificationReq> map : notification.from.entrySet()){
+                        mReceivedReq.add(map.getValue());
+                    }
                 } else {
                     //TODO: handle no notifications here
                 }
