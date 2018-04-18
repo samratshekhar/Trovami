@@ -31,6 +31,7 @@ public class UserFragment extends Fragment {
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
     private List<User> mUnfolllowedUsers;
+    private List<NotificationReq> mSentReq = new ArrayList<>();
     private User mCurrentUser;
 
     public UserFragment() {
@@ -51,12 +52,38 @@ public class UserFragment extends Fragment {
         mDialog.setCancelable(false);
         mDialog.show();
         setupFirebaseAuth();
+        fetchNotifications();
         fetchCurrentUser();
+    }
+
+    private void fetchNotifications() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if(iterator.hasNext()) {
+                    // notifications found, fetch followers and following
+                    DataSnapshot singleSnapshot = iterator.next();
+                    Notification notification = singleSnapshot.getValue(Notification.class);
+                    mSentReq.addAll(notification.to);
+                } else {
+                    //TODO: handle no notifications here
+                }
+                fetchCurrentUser();
+                mDialog.dismiss();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO: handle no notifications here
+                mDialog.dismiss();
+            }
+        };
+        Notification.getNotificationsById(currentUser.getUid(), listener);
     }
 
     private void fetchCurrentUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final UserFragment fragment = this;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -65,12 +92,14 @@ public class UserFragment extends Fragment {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
-                    fragment.fetchUnfollowedUsers();
+                    fetchUnfollowedUsers();
+                } else {
+                    // TODO: handle user req here
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
+                // TODO: handle user req here
                 mDialog.dismiss();
             }
         };
@@ -98,6 +127,27 @@ public class UserFragment extends Fragment {
             }
         };
         User.getUsers(listener);
+    }
+
+    private boolean isUnfollowed(String uid) {
+        boolean isReqSent = false;
+        Iterator<NotificationReq> iterator = mSentReq.iterator();
+        while (iterator.hasNext()) {
+            NotificationReq sentReq = iterator.next();
+            if(sentReq.to == uid) {
+                isReqSent = true;
+                break;
+            }
+        }
+        if (
+                mCurrentUser.following.contains(uid)
+                && mCurrentUser.uid != uid
+                && isReqSent
+
+           ) {
+            return false;
+        }
+        return true;
     }
 
     @Override
