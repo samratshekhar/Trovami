@@ -21,11 +21,13 @@ import java.util.List;
 
 public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<HomeGroup,String,HomeGroupViewHolder,HomeItemViewHolder>{
 
+    private Context mContext;
     private LayoutInflater mInflater;
 
     public HomeRecycleExpandableAdapater(Context context, @NonNull List<HomeGroup> homeGroups) {
         super(homeGroups);
         mInflater = LayoutInflater.from(context);
+        mContext = context;
     }
 
     // onCreate ...
@@ -49,6 +51,6 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
 
     @Override
     public void onBindChildViewHolder(@NonNull HomeItemViewHolder itemViewHolder, int parentPosition, int childPosition, @NonNull String item) {
-        itemViewHolder.bind(item);
+        itemViewHolder.bind(mContext, item);
     }
 }
