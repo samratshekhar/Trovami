@@ -57,7 +57,7 @@ public class UserFragment extends Fragment {
         mDialog.show();
         setupFirebaseAuth();
         fetchNotifications();
-        fetchCurrentUser();
+//        fetchCurrentUser();
     }
 
     private void fetchNotifications() {
@@ -127,7 +127,6 @@ public class UserFragment extends Fragment {
                     }
                 }
                 // TODO: update adapter here;
-                generateFollowReq(mUnfolllowedUsers.get(0));
                 mDialog.dismiss();
             }
             @Override

@@ -88,6 +88,7 @@ public class HomeFragment extends Fragment {
                     // user not found, create one
                     fragment.createFirebaseUser();
                 }
+                mDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
