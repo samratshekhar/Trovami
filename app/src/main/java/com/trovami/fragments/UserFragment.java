@@ -31,7 +31,7 @@ public class UserFragment extends Fragment {
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
     private List<User> mUnfolllowedUsers;
-    private List<NotificationReq> mSentReq = new ArrayList<>();
+    private List<String> mSentReq = new ArrayList<>();
     private User mCurrentUser;
 
     public UserFragment() {
@@ -66,7 +66,12 @@ public class UserFragment extends Fragment {
                     // notifications found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
-                    mSentReq.addAll(notification.to);
+
+                    Iterator<NotificationReq> sentReqIterator = notification.to.iterator();
+                    while (sentReqIterator.hasNext()) {
+                        NotificationReq sentReq = sentReqIterator.next();
+                        mSentReq.add(sentReq.to);
+                    }
                 } else {
                     //TODO: handle no notifications here
                 }
@@ -113,7 +118,8 @@ public class UserFragment extends Fragment {
                 mUnfolllowedUsers = new ArrayList<>();
                 for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
                     User user = singleSnapshot.getValue(User.class);
-                    if(!mCurrentUser.following.contains(user.uid) && mCurrentUser.uid != user.uid) {
+                    boolean isUnfollowing = isUnfollowed(user.uid);
+                    if(isUnfollowing) {
                         mUnfolllowedUsers.add(user);
                     }
                 }
@@ -130,23 +136,10 @@ public class UserFragment extends Fragment {
     }
 
     private boolean isUnfollowed(String uid) {
-        boolean isReqSent = false;
-        Iterator<NotificationReq> iterator = mSentReq.iterator();
-        while (iterator.hasNext()) {
-            NotificationReq sentReq = iterator.next();
-            if(sentReq.to == uid) {
-                isReqSent = true;
-                break;
-            }
-        }
-        if (
-                mCurrentUser.following.contains(uid)
-                && mCurrentUser.uid != uid
-                && isReqSent
-
-           ) {
-            return false;
-        }
+        boolean isAlreadyFollowing = mCurrentUser.following.contains(uid);
+        boolean isReqSent = mSentReq.contains(uid);
+        boolean isCurrentUser = mCurrentUser.uid.equals(uid);
+        if (isAlreadyFollowing || isReqSent || isCurrentUser) return false;
         return true;
     }
 
