@@ -4,9 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +16,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.models.Notification;
-import com.trovami.models.NotificationReq;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,8 +28,8 @@ public class NotificationFragment extends Fragment {
 
     private NotificationFragmentListener mListener;
     private FirebaseAuth mAuth;
-    private List<NotificationReq> mSentReq = new ArrayList<>();
-    private List<NotificationReq> mReceivedReq = new ArrayList<>();
+    private List<String> mSentReq = new ArrayList<>();
+    private List<String> mReceivedReq = new ArrayList<>();
     private ProgressDialog mDialog;
 
     public NotificationFragment() {
@@ -80,8 +77,14 @@ public class NotificationFragment extends Fragment {
                     // notifications found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
-                    mSentReq.addAll(notification.to);
-                    mReceivedReq = notification.from;
+                    if (notification.to != null) {
+                        mSentReq.clear();
+                        mSentReq.addAll(notification.to.keySet());
+                    }
+                    if (notification.from != null) {
+                        mReceivedReq.clear();
+                        mReceivedReq.addAll(notification.from.keySet());
+                    }
                 } else {
                     //TODO: handle no notifications here
                 }

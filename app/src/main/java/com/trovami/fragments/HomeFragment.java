@@ -16,10 +16,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
-import com.trovami.activities.DashboardActivity;
 import com.trovami.models.User;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +31,7 @@ public class HomeFragment extends Fragment {
 
     private HomeFragmentListener mListener;
     private FirebaseAuth mAuth;
+    private User mCurrentUser;
     private List<User> mFollowings;
     private List<User> mFollowers;
     private ProgressDialog mDialog;
@@ -83,12 +82,12 @@ public class HomeFragment extends Fragment {
                 if(iterator.hasNext()) {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
-                    User user = singleSnapshot.getValue(User.class);
-                    fragment.fetchFollowLists(user.following, user.follower);
+                    mCurrentUser = singleSnapshot.getValue(User.class);
                 } else {
                     // user not found, create one
                     fragment.createFirebaseUser();
                 }
+                mDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -97,36 +96,6 @@ public class HomeFragment extends Fragment {
             }
         };
         User.getUserById(currentUser.getUid(), listener);
-    }
-
-    private void fetchFollowLists(final List<String> following, final List<String> follower) {
-        User.getUsers(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                    User user = singleSnapshot.getValue(User.class);
-                    if(following.contains(user.uid)) {
-                        if (mFollowings == null) {
-                            mFollowings = new ArrayList<User>();
-                        }
-                        mFollowings.add(user);
-                    }
-                    else  if (follower.contains(user.uid)) {
-                        if (mFollowers == null) {
-                            mFollowers = new ArrayList<User>();
-                        }
-                        mFollowers.add(user);
-                    }
-                }
-                // TODO: update adapter here;
-                mDialog.dismiss();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
-                mDialog.dismiss();
-            }
-        });
     }
 
     private void createFirebaseUser() {

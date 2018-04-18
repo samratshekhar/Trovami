@@ -27,16 +27,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     private static final String TAG = "UserAdapter";
     private List<User> mUnfolllowedUsers = new ArrayList<>();
     private Context mContext;
+    private LayoutInflater mInflater;
 
     public UserAdapter(Context context, List<User> mUnfolllowedUsers) {
         this.mUnfolllowedUsers = mUnfolllowedUsers;
         this.mContext = context;
+        this.mInflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        //View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        View view = mInflater.inflate(R.layout.list_item, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -47,11 +50,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         User user = mUnfolllowedUsers.get(position);
 
 
-            holder.uid.setText(user.uid);
+//            holder.uid.setText(user.uid);
             holder.name.setText(user.name);
-            holder.email.setText(user.email);
-            holder.phone.setText(user.phone);
-            holder.gender.setText(user.gender);
+//            holder.email.setText(user.email);
+//            holder.phone.setText(user.phone);
+//            holder.gender.setText(user.gender);
             Glide.with(mContext)
                 .load(user.photoUrl)
                 .into(holder.photo);

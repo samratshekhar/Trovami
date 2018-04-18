@@ -9,6 +9,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,8 +25,8 @@ public class User implements Parcelable {
     public String gender;
     public String photoUrl;
     public LatLong latLong;
-    public List<String> follower;
-    public List<String> following;
+    public HashMap<String, String> follower;
+    public HashMap<String, String> following;
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
@@ -61,18 +62,8 @@ public class User implements Parcelable {
         gender = in.readString();
         photoUrl = in.readString();
         latLong = (LatLong) in.readValue(LatLong.class.getClassLoader());
-        if (in.readByte() == 0x01) {
-            follower = new ArrayList<String>();
-            in.readList(follower, String.class.getClassLoader());
-        } else {
-            follower = null;
-        }
-        if (in.readByte() == 0x01) {
-            following = new ArrayList<String>();
-            in.readList(following, String.class.getClassLoader());
-        } else {
-            following = null;
-        }
+        follower = (HashMap) in.readValue(HashMap.class.getClassLoader());
+        following = (HashMap) in.readValue(HashMap.class.getClassLoader());
     }
 
     @Override
@@ -89,18 +80,8 @@ public class User implements Parcelable {
         dest.writeString(gender);
         dest.writeString(photoUrl);
         dest.writeValue(latLong);
-        if (follower == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(follower);
-        }
-        if (following == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(following);
-        }
+        dest.writeValue(follower);
+        dest.writeValue(following);
     }
 
     @SuppressWarnings("unused")
