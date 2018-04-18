@@ -161,12 +161,12 @@ public class UserFragment extends Fragment {
 
         // TODO: add notification entry for current user (to)
         DatabaseReference senderRef = database.child(RDBSchema.Notification.TABLE_NAME).child(mCurrentUser.uid).child("to");
-        senderRef.push().setValue(senderReq);
+        senderRef.child(user.uid).setValue(senderReq);
 
 
         // TODO: add notification entry for end user(from)
         DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
-        receiverRef.push().setValue(receiverReq);
+        receiverRef.child(mCurrentUser.uid).setValue(receiverReq);
     }
 
     @Override
