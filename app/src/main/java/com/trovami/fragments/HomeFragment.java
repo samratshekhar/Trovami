@@ -41,7 +41,7 @@ public class HomeFragment extends Fragment {
 
     private HomeFragmentListener mListener;
     private FirebaseAuth mAuth;
-
+    private User mCurrentUser;
     private ProgressDialog mDialog;
     //private HomeExpandableAdapter mHomeExpandableAdapter;
     private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
@@ -115,12 +115,12 @@ public class HomeFragment extends Fragment {
                 if(iterator.hasNext()) {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
-                    User user = singleSnapshot.getValue(User.class);
-                    if (user.following != null) {
-                        mGrouplist.get(0).getChildList().addAll(user.following);
+                    mCurrentUser = singleSnapshot.getValue(User.class);
+                    if (mCurrentUser.following != null) {
+                        mGrouplist.get(0).getChildList().addAll(mCurrentUser.following.keySet());
                     }
-                    if (user.follower != null) {
-                        mGrouplist.get(1).getChildList().addAll(user.follower);
+                    if (mCurrentUser.follower != null) {
+                        mGrouplist.get(1).getChildList().addAll(mCurrentUser.follower.keySet());
                     }
                     mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
                 } else {

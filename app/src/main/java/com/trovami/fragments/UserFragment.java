@@ -14,13 +14,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.models.Notification;
-import com.trovami.models.NotificationReq;
+import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class UserFragment extends Fragment {
     private FirebaseAuth mAuth;
     private ProgressDialog mDialog;
     private List<User> mUnfolllowedUsers;
+    private List<String> mSentReq = new ArrayList<>();
     private User mCurrentUser;
 
     public UserFragment() {
@@ -51,12 +55,41 @@ public class UserFragment extends Fragment {
         mDialog.setCancelable(false);
         mDialog.show();
         setupFirebaseAuth();
-        fetchCurrentUser();
+        fetchNotifications();
+//        fetchCurrentUser();
+    }
+
+    private void fetchNotifications() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if(iterator.hasNext()) {
+                    // notifications found, fetch followers and following
+                    DataSnapshot singleSnapshot = iterator.next();
+                    Notification notification = singleSnapshot.getValue(Notification.class);
+                    if (notification.to != null) {
+                        mSentReq.clear();
+                        mSentReq.addAll(notification.to.keySet());
+                    }
+                } else {
+                    //TODO: handle no notifications here
+                }
+                fetchCurrentUser();
+                mDialog.dismiss();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO: handle no notifications here
+                mDialog.dismiss();
+            }
+        };
+        Notification.getNotificationsById(currentUser.getUid(), listener);
     }
 
     private void fetchCurrentUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final UserFragment fragment = this;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -65,12 +98,14 @@ public class UserFragment extends Fragment {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
-                    fragment.fetchUnfollowedUsers();
+                    fetchUnfollowedUsers();
+                } else {
+                    // TODO: handle user req here
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
+                // TODO: handle user req here
                 mDialog.dismiss();
             }
         };
@@ -84,7 +119,8 @@ public class UserFragment extends Fragment {
                 mUnfolllowedUsers = new ArrayList<>();
                 for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
                     User user = singleSnapshot.getValue(User.class);
-                    if(!mCurrentUser.following.contains(user.uid) && mCurrentUser.uid != user.uid) {
+                    boolean isUnfollowing = isUnfollowed(user.uid);
+                    if(isUnfollowing) {
                         mUnfolllowedUsers.add(user);
                     }
                 }
@@ -98,6 +134,27 @@ public class UserFragment extends Fragment {
             }
         };
         User.getUsers(listener);
+    }
+
+    private boolean isUnfollowed(String uid) {
+        boolean isAlreadyFollowing = mCurrentUser.following.containsKey(uid);
+        boolean isReqSent = mSentReq.contains(uid);
+        boolean isCurrentUser = mCurrentUser.uid.equals(uid);
+        if (isAlreadyFollowing || isReqSent || isCurrentUser) return false;
+        return true;
+    }
+
+    private void generateFollowReq(User user) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+
+
+        // TODO: add notification entry for current user (to)
+        DatabaseReference senderRef = database.child(RDBSchema.Notification.TABLE_NAME).child(mCurrentUser.uid).child("to");
+        senderRef.child(user.uid).setValue(user.uid);
+
+        // TODO: add notification entry for end user(from)
+        DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
+        receiverRef.child(mCurrentUser.uid).setValue(mCurrentUser.uid);
     }
 
     @Override
