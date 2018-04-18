@@ -140,7 +140,7 @@ public class UserFragment extends Fragment {
     }
 
     private boolean isUnfollowed(String uid) {
-        boolean isAlreadyFollowing = mCurrentUser.following.contains(uid);
+        boolean isAlreadyFollowing = mCurrentUser.following.containsKey(uid);
         boolean isReqSent = mSentReq.contains(uid);
         boolean isCurrentUser = mCurrentUser.uid.equals(uid);
         if (isAlreadyFollowing || isReqSent || isCurrentUser) return false;
