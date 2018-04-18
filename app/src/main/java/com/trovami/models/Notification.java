@@ -9,6 +9,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,8 +18,8 @@ import java.util.List;
 public class Notification implements Parcelable {
     public static final String TAG = "NotificationModel";
     public String uid;
-    public List<NotificationReq> from;
-    public List<NotificationReq> to;
+    public HashMap<String, NotificationReq> from;
+    public HashMap<String, NotificationReq> to;
     public Notification() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
@@ -40,18 +41,8 @@ public class Notification implements Parcelable {
 
     protected Notification(Parcel in) {
         uid = in.readString();
-        if (in.readByte() == 0x01) {
-            from = new ArrayList<NotificationReq>();
-            in.readList(from, NotificationReq.class.getClassLoader());
-        } else {
-            from = null;
-        }
-        if (in.readByte() == 0x01) {
-            to = new ArrayList<NotificationReq>();
-            in.readList(to, NotificationReq.class.getClassLoader());
-        } else {
-            to = null;
-        }
+        from = (HashMap) in.readValue(HashMap.class.getClassLoader());
+        to = (HashMap) in.readValue(HashMap.class.getClassLoader());
     }
 
     @Override
@@ -62,18 +53,8 @@ public class Notification implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(uid);
-        if (from == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(from);
-        }
-        if (to == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(to);
-        }
+        dest.writeValue(from);
+        dest.writeValue(to);
     }
 
     @SuppressWarnings("unused")
