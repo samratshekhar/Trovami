@@ -16,10 +16,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
-import com.trovami.activities.DashboardActivity;
 import com.trovami.models.User;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +31,7 @@ public class HomeFragment extends Fragment {
 
     private HomeFragmentListener mListener;
     private FirebaseAuth mAuth;
+    private User mCurrentUser;
     private List<User> mFollowings;
     private List<User> mFollowers;
     private ProgressDialog mDialog;
@@ -83,7 +82,7 @@ public class HomeFragment extends Fragment {
                 if(iterator.hasNext()) {
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
-                    User user = singleSnapshot.getValue(User.class);
+                    mCurrentUser = singleSnapshot.getValue(User.class);
                 } else {
                     // user not found, create one
                     fragment.createFirebaseUser();

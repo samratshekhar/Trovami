@@ -19,14 +19,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.models.Notification;
-import com.trovami.models.NotificationReq;
 import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class UserFragment extends Fragment {
     private static final String TAG = "UserFragment";
@@ -70,10 +69,9 @@ public class UserFragment extends Fragment {
                     // notifications found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
-                    for (Map.Entry<String, NotificationReq> entry : notification.to.entrySet()) {
-                        System.out.println(entry.getKey() + "/" + entry.getValue());
-                        NotificationReq sentReq = entry.getValue();
-                        mSentReq.add(sentReq.to);
+                    if (notification.to != null) {
+                        mSentReq.clear();
+                        mSentReq.addAll(notification.to.keySet());
                     }
                 } else {
                     //TODO: handle no notifications here
@@ -149,23 +147,14 @@ public class UserFragment extends Fragment {
     private void generateFollowReq(User user) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-        NotificationReq senderReq = new NotificationReq();
-        senderReq.to = user.uid;
-        senderReq.status = "pending";
-
-        NotificationReq receiverReq = new NotificationReq();
-        receiverReq.from = mCurrentUser.uid;
-        receiverReq.status = "pending";
-
 
         // TODO: add notification entry for current user (to)
         DatabaseReference senderRef = database.child(RDBSchema.Notification.TABLE_NAME).child(mCurrentUser.uid).child("to");
-        senderRef.child(user.uid).setValue(senderReq);
-
+        senderRef.child(user.uid).setValue(user.uid);
 
         // TODO: add notification entry for end user(from)
         DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
-        receiverRef.child(mCurrentUser.uid).setValue(receiverReq);
+        receiverRef.child(mCurrentUser.uid).setValue(mCurrentUser.uid);
     }
 
     @Override
