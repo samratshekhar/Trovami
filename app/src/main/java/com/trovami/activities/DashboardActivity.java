@@ -1,30 +1,41 @@
 package com.trovami.activities;
 
 import android.Manifest;
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
+import com.trovami.fragments.HomeFragment;
+import com.trovami.fragments.MapFragment;
+import com.trovami.fragments.NotificationFragment;
+import com.trovami.fragments.UserFragment;
+import com.trovami.models.Notification;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
 import com.trovami.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -32,10 +43,14 @@ public class DashboardActivity extends AppCompatActivity
     private static final String TAG = "DashboardActivity";
     private ActivityDashboardBinding mBinding;
 
+    private HomeFragment mHomeFragment;
+    private NotificationFragment mNotificationFragment;
+    private UserFragment mUserFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupUI();
+        this.setupUI();
         if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION }, 1);
@@ -44,24 +59,14 @@ public class DashboardActivity extends AppCompatActivity
         } else {
             Log.d(TAG, "Service up");
         }
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        createFirebaseUser();
     }
 
-    private void createFirebaseUser() {
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        User user = new User();
-        user.email = currentUser.getEmail();
-        user.name = currentUser.getDisplayName();
-        user.photoUrl = currentUser.getPhotoUrl().toString();
-        user.uid = currentUser.getUid();
-        User.setUserById(user, currentUser.getUid());
-    }
 
     private void setupUI() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard);
@@ -90,17 +95,25 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        Fragment fragment = null;
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+        if (id == R.id.nav_home) {
+            if(mHomeFragment == null) {
+                mHomeFragment = HomeFragment.newInstance();
+            }
+            fragment = mHomeFragment;
+        } else if (id == R.id.nav_notifications) {
+            if(mNotificationFragment == null) {
+                mNotificationFragment = NotificationFragment.newInstance();
+            }
+            fragment = mNotificationFragment;
+        } else if (id == R.id.nav_add_user) {
+            if (mUserFragment == null) {
+                mUserFragment = UserFragment.newInstance();
+            }
+            fragment = mUserFragment;
+        } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_logout) {
             FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -108,6 +121,13 @@ public class DashboardActivity extends AppCompatActivity
             Intent logoutIntent = new Intent(this, MainActivity.class);
             startActivity(logoutIntent);
             finish();
+        }
+
+        try {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
