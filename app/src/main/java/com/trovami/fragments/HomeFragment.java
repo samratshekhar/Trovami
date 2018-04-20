@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,9 +49,10 @@ public class HomeFragment extends Fragment {
     private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
     // private ExpandableListView mExpandableListView;
     private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private HashMap<String, User> userMap = new HashMap<>();
-    private HashMap<String, List<String>> userIdMap = new HashMap<>();
+    //private HashMap<String, User> userMap = new HashMap<>();
+    //private HashMap<String, List<String>> userIdMap = new HashMap<>();
     private List<HomeGroup> mGrouplist = new ArrayList<>();
 
     public HomeFragment() {
@@ -97,6 +100,13 @@ public class HomeFragment extends Fragment {
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        mSwipeRefreshLayout = v.findViewById(R.id.swipeLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchCurrentUser();
+            }
+        });
 
         return v;
     }
@@ -117,9 +127,11 @@ public class HomeFragment extends Fragment {
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
                     if (mCurrentUser.following != null) {
+                        mGrouplist.get(0).getChildList().clear(); //to avoid duplication when screen refreshed
                         mGrouplist.get(0).getChildList().addAll(mCurrentUser.following.keySet());
                     }
                     if (mCurrentUser.follower != null) {
+                        mGrouplist.get(1).getChildList().clear(); //to avoid duplication when screen refreshed
                         mGrouplist.get(1).getChildList().addAll(mCurrentUser.follower.keySet());
                     }
                     mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
@@ -128,11 +140,20 @@ public class HomeFragment extends Fragment {
                     fragment.createFirebaseUser();
                 }
                 mDialog.dismiss();
+
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // TODO: handle error
                 mDialog.dismiss();
+
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getContext(), "Could not refresh data", Toast.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
         };
         User.getUserById(currentUser.getUid(), listener);
