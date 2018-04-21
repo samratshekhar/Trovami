@@ -88,6 +88,7 @@ public class NotificationFragment extends Fragment {
                 } else {
                     //TODO: handle no notifications here
                 }
+
                 mDialog.dismiss();
             }
             @Override
@@ -97,6 +98,13 @@ public class NotificationFragment extends Fragment {
             }
         };
         Notification.getNotificationsById(currentUser.getUid(), listener);
+    }
+
+    private void acceptRequest(String uid) {
+        // TODO: update following list
+        // TODO: update follower list
+        // TODO: remove from notification
+        // TODO: remove to notification
     }
 
     @Override

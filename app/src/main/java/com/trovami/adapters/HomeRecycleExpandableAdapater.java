@@ -12,7 +12,9 @@ import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
 import com.bignerdranch.expandablerecyclerview.model.Parent;
 import com.trovami.R;
 import com.trovami.models.HomeGroup;
+import com.trovami.models.User;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -23,11 +25,13 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
 
     private Context mContext;
     private LayoutInflater mInflater;
+    private HashMap<String, User> mUserMap;
 
-    public HomeRecycleExpandableAdapater(Context context, @NonNull List<HomeGroup> homeGroups) {
+    public HomeRecycleExpandableAdapater(Context context, @NonNull List<HomeGroup> homeGroups, HashMap<String, User> userMap) {
         super(homeGroups);
         mInflater = LayoutInflater.from(context);
         mContext = context;
+        mUserMap = userMap;
     }
 
     // onCreate ...
@@ -51,6 +55,6 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
 
     @Override
     public void onBindChildViewHolder(@NonNull HomeItemViewHolder itemViewHolder, int parentPosition, int childPosition, @NonNull String item) {
-        itemViewHolder.bind(mContext, item);
+        itemViewHolder.bind(mContext, item, mUserMap);
     }
 }

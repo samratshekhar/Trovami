@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,8 +20,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
-import com.trovami.activities.DashboardActivity;
-import com.trovami.adapters.HomeExpandableAdapter;
 import com.trovami.adapters.HomeRecycleExpandableAdapater;
 import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
@@ -45,14 +42,11 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth mAuth;
     private User mCurrentUser;
     private ProgressDialog mDialog;
-    //private HomeExpandableAdapter mHomeExpandableAdapter;
     private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
-    // private ExpandableListView mExpandableListView;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    //private HashMap<String, User> userMap = new HashMap<>();
-    //private HashMap<String, List<String>> userIdMap = new HashMap<>();
+    private HashMap<String, User> userMap = new HashMap<>();
     private List<HomeGroup> mGrouplist = new ArrayList<>();
 
     public HomeFragment() {
@@ -83,23 +77,25 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        List<String> headers = Arrays.asList("Follower","Following");
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        setupListView(v);
+        setupSwipeRefreshLayout(v);
+        return v;
+    }
 
-//        mHomeExpandableAdapter = new HomeExpandableAdapter(getContext(), headers , userIdMap, userMap);
-//        mExpandableListView = v.findViewById(R.id.expandable_list_view);
-//        mExpandableListView.setAdapter(mHomeExpandableAdapter);
-
+    private void setupListView(View v) {
+        List<String> headers = Arrays.asList("Follower","Following");
 
         mGrouplist.add(new HomeGroup("Following",new ArrayList<String>()));
         mGrouplist.add(new HomeGroup("Followers",new ArrayList<String>()));
 
-
-        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist);
+        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist, userMap);
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
 
+    private void setupSwipeRefreshLayout(View v) {
         mSwipeRefreshLayout = v.findViewById(R.id.swipeLayout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -107,8 +103,6 @@ public class HomeFragment extends Fragment {
                 fetchCurrentUser();
             }
         });
-
-        return v;
     }
 
     private void setupFirebaseAuth() {
@@ -117,7 +111,6 @@ public class HomeFragment extends Fragment {
 
     private void fetchCurrentUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final HomeFragment fragment = this;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -137,7 +130,7 @@ public class HomeFragment extends Fragment {
                     mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
                 } else {
                     // user not found, create one
-                    fragment.createFirebaseUser();
+                    createFirebaseUser();
                 }
                 mDialog.dismiss();
 
