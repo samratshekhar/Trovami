@@ -2,15 +2,18 @@ package com.trovami.activities;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.R;
 import com.trovami.databinding.ActivityProfileBinding;
+import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -61,7 +64,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     void onUpdateFormClicked(View v) {
-        Toast.makeText(getApplicationContext(), "Form edit", Toast.LENGTH_LONG).show();
         String name = mBinding.nameEditText.getText().toString().trim();
         String email = mBinding.emailEditText.getText().toString().trim();
         String phone = mBinding.phoneEditText.getText().toString().trim();
@@ -88,11 +90,20 @@ public class ProfileActivity extends AppCompatActivity {
             mBinding.phoneEditTextLayout.setError(null);
         }
 
-        if (nameValidation == null || emailValidation == null || phoneValidation == null) {
-            return;
-        } else {
+        if (nameValidation == null && emailValidation == null && phoneValidation == null) {
             // update user attributes;
+            updateUser(name, email, phone);
         }
+    }
+
+    private void updateUser(String name, String email, String phone) {
+        mUser.name = name;
+        mUser.email = email;
+        mUser.phone = phone;
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userRef = database.child(RDBSchema.Users.TABLE_NAME).child(mUser.uid);
+        userRef.setValue(mUser);
+        Toast.makeText(getApplicationContext(), "Form edit", Toast.LENGTH_LONG).show();
     }
 
     private String validateName(String name) {
