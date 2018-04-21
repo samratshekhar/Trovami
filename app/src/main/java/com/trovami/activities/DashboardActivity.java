@@ -87,7 +87,12 @@ public class DashboardActivity extends AppCompatActivity
         final Activity activity = this;
         mBinding.fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                User user = new User();
+                user.name = "Samrat";
+                user.email = null;
                 Intent intent = new Intent(activity, ProfileActivity.class);
+                intent.putExtra("user", user);
+                intent.putExtra("isUpdate", true);
                 startActivity(intent);
             }
         });
