@@ -48,10 +48,10 @@ public class ProfileInfoEdit extends Fragment {
         phoneEditText=view.findViewById(R.id.eT_phone);
         lastupdateTextView=view.findViewById(R.id.tV_last_update_time);
 
-        nameEditText.setText(user.name);
-        emailEditText.setText(user.email);
-        phoneEditText.setText("to do");
-        lastupdateTextView.setText("to do");
+//        nameEditText.setText(user.name);
+//        emailEditText.setText(user.email);
+//        phoneEditText.setText("to do");
+//        lastupdateTextView.setText("to do");
 
         return view;
     }
