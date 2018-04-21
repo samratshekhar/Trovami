@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.trovami.R;
-import com.trovami.models.NotificationReq;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
@@ -25,18 +24,16 @@ import java.util.List;
  * Created by TULIKA on 18-Apr-18.
  */
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder>{
+public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.SentReqViewHolder>{
     private static final String TAG = "NotificationAdapter";
     private static final int SentReq = 1;
     private static final int ReceivedReq = 2;
 
-    private List<NotificationReq> mSentReq = new ArrayList<>();
-    private List<NotificationReq> mReceivedReq = new ArrayList<>();
+    private List<String> mSentReq = new ArrayList<>();
     private Context mContext;
 
-    public NotificationAdapter(Context context, List<String> mSentReq, List<String> mReceivedReq) {
+    public NotificationAdapter(Context context, List<String> mSentReq) {
         this.mSentReq = mSentReq;
-        this.mReceivedReq = mReceivedReq;
         this.mContext = context;
 
         //This constructor would switch what to findViewBy according to the type of viewType
@@ -55,21 +52,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @NonNull
     @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public SentReqViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View v;
-        ViewHolder vh;
+        SentReqViewHolder vh;
         // create a new view
-        switch (viewType) {
-            case 1: //sent requests
+   //     switch (viewType) {
+//            case 1: //sent requests
                 v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.list_item, parent, false);
                 vh = new SentReqViewHolder(v);
                 return  vh;
-            case 2: //received requests
-                v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.list_item, parent, false);
-                vh = new ReceivedReqViewHolder(v);
+//            case 2: //received requests
+//                v = LayoutInflater.from(parent.getContext())
+//                        .inflate(R.layout.list_item, parent, false);
+//                vh = new ReceivedReqViewHolder(v);
 //                v.setOnClickListener(new View.OnClickListener(){
 //
 //                    @Override
@@ -79,7 +76,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 //                        mContext.startActivity(intent);
 //                    }
 //                });
-                return vh;
+     //           return vh;
         }
 
 //            View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
@@ -92,27 +89,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 //            return new ReceivedReqViewHolder(view);
 //        }
 //
-        return null;
-    }
+      //  return null;
 
     @Override
-    public void onBindViewHolder(NotificationAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(SentReqViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: called");
-        NotificationReq SentReq = mSentReq.get(position);
-        NotificationReq ReceivedReq = mReceivedReq.get(position);
+        String SentReq = mSentReq.get(position);
 
-        if(position < mSentReq.size()){
-            holder.name.setText(SentReq.name);
-            Glide.with(mContext)
-                    .load(SentReq.photoUrl)
-                    .into(holder.photo);
-        }
-        if(position - mSentReq.size() < mReceivedReq.size()){
-            holder.name.setText(ReceivedReq.name);
-            Glide.with(mContext)
-                    .load(ReceivedReq.photoUrl)
-                    .into(holder.photo);
-        }
+        holder.name.setText(SentReq);
+
+//        if(position < mSentReq.size()){
+//            holder.name.setText(SentReq.name);
+//            Glide.with(mContext)
+//                    .load(SentReq.photoUrl)
+//                    .into(holder.photo);
+//        }
+//        if(position - mSentReq.size() < mReceivedReq.size()){
+//            holder.name.setText(ReceivedReq.name);
+//            Glide.with(mContext)
+//                    .load(ReceivedReq.photoUrl)
+//                    .into(holder.photo);
+//        }
 
 
 //        holder.from.setText(user.from);
@@ -139,21 +136,21 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public int getItemCount() {
-        return mSentReq.size() + mReceivedReq.size();
+        return mSentReq.size();
     }
 
-    @Override
-    public int getItemViewType(int position){
-        if(position < mSentReq.size()){
-            return SentReq;
-        }
-
-        if(position - mSentReq.size() < mReceivedReq.size()){
-            return ReceivedReq;
-        }
-
-        return -1;
-    }
+//    @Override
+//    public int getItemViewType(int position){
+//        if(position < mSentReq.size()){
+//            return SentReq;
+//        }
+//
+//        if(position - mSentReq.size() < mReceivedReq.size()){
+//            return ReceivedReq;
+//        }
+//
+//        return -1;
+//    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

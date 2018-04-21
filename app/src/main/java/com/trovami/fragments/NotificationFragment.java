@@ -65,7 +65,7 @@ public class NotificationFragment extends Fragment {
         // Inflate the layout for this fragment
         View v  = inflater.inflate(R.layout.fragment_notification, container, false);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
-        mAdapter = new NotificationAdapter(getContext(), mSentReq, mReceivedReq);
+        mAdapter = new NotificationAdapter(getContext(), mSentReq);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return v;
@@ -96,6 +96,7 @@ public class NotificationFragment extends Fragment {
                 } else {
                     //TODO: handle no notifications here
                 }
+                mAdapter.notifyDataSetChanged();
                 mDialog.dismiss();
             }
             @Override
