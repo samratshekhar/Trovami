@@ -74,7 +74,6 @@ public class HomeFragment extends Fragment {
 
     private void fetchCurrentUser() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final HomeFragment fragment = this;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -85,7 +84,7 @@ public class HomeFragment extends Fragment {
                     mCurrentUser = singleSnapshot.getValue(User.class);
                 } else {
                     // user not found, create one
-                    fragment.createFirebaseUser();
+                    createFirebaseUser();
                 }
                 mDialog.dismiss();
             }

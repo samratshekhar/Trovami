@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,23 +24,24 @@ import java.util.List;
  * Created by TULIKA on 16-Apr-18.
  */
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private static final String TAG = "UserAdapter";
     private List<User> mUnfolllowedUsers = new ArrayList<>();
     private Context mContext;
     private LayoutInflater mInflater;
+    private UserActionListener mlistener;
 
-    public UserAdapter(Context context, List<User> mUnfolllowedUsers) {
+    public UserAdapter(Context context, List<User> mUnfolllowedUsers, UserActionListener listener) {
         this.mUnfolllowedUsers = mUnfolllowedUsers;
         this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
+        mlistener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
-        View view = mInflater.inflate(R.layout.list_item, parent, false);
+        View view = mInflater.inflate(R.layout.list_user_item, parent, false);
         ViewHolder holder = new ViewHolder(view);
         return holder;
     }
@@ -47,25 +49,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called");
-        User user = mUnfolllowedUsers.get(position);
-
-
-//            holder.uid.setText(user.uid);
-            holder.name.setText(user.name);
-//            holder.email.setText(user.email);
-//            holder.phone.setText(user.phone);
-//            holder.gender.setText(user.gender);
-            Glide.with(mContext)
-                .load(user.photoUrl)
-                .into(holder.photo);
-
-            holder.parentLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "onClick: clicked on" + mUnfolllowedUsers.get(position));
-                    Toast.makeText(mContext, (CharSequence) mUnfolllowedUsers.get(position), Toast.LENGTH_SHORT).show();
-                }
-            });
+        final User user = mUnfolllowedUsers.get(position);
+        holder.setViewHolder(user);
+        holder.addutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mlistener.onActionClicked(user);
+            }
+        });
     }
 
     @Override
@@ -73,22 +64,40 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         return mUnfolllowedUsers.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView uid;
-        TextView name;
-        TextView email;
-        TextView phone;
-        TextView gender;
-        ImageView photo;
+        TextView title;
+        TextView subtitle;
+        ImageView profilePic;
+        Button addutton;
         RelativeLayout parentLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            photo = itemView.findViewById(R.id.user_Image);
-            name = itemView.findViewById(R.id.user_Name);
+            title = itemView.findViewById(R.id.title_text_view);
+            subtitle = itemView.findViewById(R.id.subtitle_text_view);
+            profilePic = itemView.findViewById(R.id.image_view);
+            addutton = itemView.findViewById(R.id.add_button);
             parentLayout = itemView.findViewById(R.id.parent_layout);
 
         }
+
+        public void clearViewHolder() {
+            title.setText(null);
+            subtitle.setText(null);
+        }
+
+        public void setViewHolder(User user) {
+            title.setText(user.name);
+            subtitle.setText(user.email);
+            Glide.with(mContext)
+                    .load(user.photoUrl)
+                    .into(profilePic);
+
+        }
+    }
+
+    public interface UserActionListener {
+        void onActionClicked(User user);
     }
 }

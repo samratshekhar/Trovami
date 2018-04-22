@@ -2,15 +2,18 @@ package com.trovami.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class UserFragment extends Fragment {
+public class UserFragment extends Fragment implements UserAdapter.UserActionListener{
     private static final String TAG = "UserFragment";
 
     private UserFragmentListener mListener;
@@ -151,14 +154,15 @@ public class UserFragment extends Fragment {
     private void generateFollowReq(User user) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-
-        // TODO: add notification entry for current user (to)
+        // add notification entry for current user (to)
         DatabaseReference senderRef = database.child(RDBSchema.Notification.TABLE_NAME).child(mCurrentUser.uid).child("to");
         senderRef.child(user.uid).setValue(user.uid);
 
-        // TODO: add notification entry for end user(from)
+        // add notification entry for end user(from)
         DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
         receiverRef.child(mCurrentUser.uid).setValue(mCurrentUser.uid);
+
+        Toast.makeText(getContext(), "Request sent.",Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -167,7 +171,7 @@ public class UserFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user, container, false);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
-        mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers);
+        mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers, this);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return v;
@@ -189,6 +193,20 @@ public class UserFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onActionClicked(final User user) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setTitle("Send follow request to " + user.name);
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                generateFollowReq(user);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", null);
+        alertDialogBuilder.create().show();
     }
 
     public interface UserFragmentListener {

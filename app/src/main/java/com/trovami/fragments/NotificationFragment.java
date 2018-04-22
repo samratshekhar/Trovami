@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
-import com.trovami.adapters.NotificationAdapter;
 import com.trovami.models.Notification;
 
 import java.util.ArrayList;
@@ -34,7 +31,6 @@ public class NotificationFragment extends Fragment {
     private List<String> mSentReq = new ArrayList<>();
     private List<String> mReceivedReq = new ArrayList<>();
     private ProgressDialog mDialog;
-    private NotificationAdapter mAdapter;
 
     public NotificationFragment() {
         // Required empty public constructor
@@ -64,10 +60,6 @@ public class NotificationFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         View v  = inflater.inflate(R.layout.fragment_notification, container, false);
-        RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
-        mAdapter = new NotificationAdapter(getContext(), mSentReq);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return v;
     }
 
@@ -96,7 +88,7 @@ public class NotificationFragment extends Fragment {
                 } else {
                     //TODO: handle no notifications here
                 }
-                mAdapter.notifyDataSetChanged();
+
                 mDialog.dismiss();
             }
             @Override
@@ -106,6 +98,13 @@ public class NotificationFragment extends Fragment {
             }
         };
         Notification.getNotificationsById(currentUser.getUid(), listener);
+    }
+
+    private void acceptRequest(String uid) {
+        // TODO: update following list
+        // TODO: update follower list
+        // TODO: remove from notification
+        // TODO: remove to notification
     }
 
     @Override
