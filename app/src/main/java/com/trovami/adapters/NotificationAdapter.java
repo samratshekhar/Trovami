@@ -8,196 +8,108 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by TULIKA on 18-Apr-18.
  */
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.SentReqViewHolder>{
+public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder>{
     private static final String TAG = "NotificationAdapter";
     private static final int SentReq = 1;
     private static final int ReceivedReq = 2;
 
-    private List<String> mSentReq = new ArrayList<>();
+    private List<String> mReqList = new ArrayList<>();
     private Context mContext;
+    private HashMap<String, User> mUserMap;
 
-    public NotificationAdapter(Context context, List<String> mSentReq) {
-        this.mSentReq = mSentReq;
+    public NotificationAdapter(Context context, List<String> reqList, HashMap<String, User> userMap) {
+        this.mReqList = reqList;
         this.mContext = context;
-
-        //This constructor would switch what to findViewBy according to the type of viewType
-//        public ViewHolder(View v, int viewType) {
-//            super(v);
-//            if (viewType == 0) {
-//                name = (TextView) v.findViewById(R.id.name);
-//                decsription = (TextView) v.findViewById(R.id.description);
-//            } else if (viewType == 1) {
-//                place = (TextView) v.findViewById(R.id.place);
-//                pics = (ImageView) v.findViewById(R.id.pics);
-//            }
-//        }
-
+        this.mUserMap = userMap;
     }
 
     @NonNull
     @Override
-        public SentReqViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View v;
-        SentReqViewHolder vh;
-        // create a new view
-   //     switch (viewType) {
-//            case 1: //sent requests
-                v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.list_item, parent, false);
-                vh = new SentReqViewHolder(v);
-                return  vh;
-//            case 2: //received requests
-//                v = LayoutInflater.from(parent.getContext())
-//                        .inflate(R.layout.list_item, parent, false);
-//                vh = new ReceivedReqViewHolder(v);
-//                v.setOnClickListener(new View.OnClickListener(){
-//
-//                    @Override
-//                    public void onClick(View v) {
-//                        Intent intent = new Intent(mContext, nextActivity.class);
-//                        intent.putExtra("ListNo",mRecyclerView.getChildPosition(v));
-//                        mContext.startActivity(intent);
-//                    }
-//                });
-     //           return vh;
-        }
-
-//            View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
-//            RecyclerView.ViewHolder holder = new RecyclerView.ViewHolder(view);
-//        if(viewType == SentReq){
-//            return new SentReqViewHolder(view);
-//        }
-//
-//        if(viewType == ReceivedReq){
-//            return new ReceivedReqViewHolder(view);
-//        }
-//
-      //  return null;
-
-    @Override
-    public void onBindViewHolder(SentReqViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: called");
-        String SentReq = mSentReq.get(position);
-
-        holder.name.setText(SentReq);
-
-//        if(position < mSentReq.size()){
-//            holder.name.setText(SentReq.name);
-//            Glide.with(mContext)
-//                    .load(SentReq.photoUrl)
-//                    .into(holder.photo);
-//        }
-//        if(position - mSentReq.size() < mReceivedReq.size()){
-//            holder.name.setText(ReceivedReq.name);
-//            Glide.with(mContext)
-//                    .load(ReceivedReq.photoUrl)
-//                    .into(holder.photo);
-//        }
-
-
-//        holder.from.setText(user.from);
-//        holder.to.setText(user.to);
-//        holder.status.setText(user.status);
-//        holder.name.setText(user.name);
-//        Glide.with(mContext)
-//                .load(user.photoUrl)
-//                .into(holder.photo);
-
-//        holder.parentLayout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "onClick: clicked on" + mUnfolllowedUsers.get(position));
-//                Toast.makeText(mContext, (CharSequence) mUnfolllowedUsers.get(position), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        ViewHolder vh = new ViewHolder(v);
+        return  vh;
     }
 
-//    @Override
-//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-//    }
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder: called");
+        User user = mUserMap.get(mReqList.get(position));
+        if (user != null) {
+            holder.setViewHolder(user);
+        } else {
+            holder.clearViewHolder();
+            ValueEventListener listener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                    if(iterator.hasNext()) {
+                        DataSnapshot singleSnapshot = iterator.next();
+                        User currentUser = singleSnapshot.getValue(User.class);
+                        mUserMap.put(currentUser.uid, currentUser);
+                        holder.setViewHolder(currentUser);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            };
+            User.getUserById(mReqList.get(position), listener);
+        }
+    }
 
     @Override
     public int getItemCount() {
-        return mSentReq.size();
+        return mReqList.size();
     }
-
-//    @Override
-//    public int getItemViewType(int position){
-//        if(position < mSentReq.size()){
-//            return SentReq;
-//        }
-//
-//        if(position - mSentReq.size() < mReceivedReq.size()){
-//            return ReceivedReq;
-//        }
-//
-//        return -1;
-//    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView name;
-        ImageView photo;
+        TextView titleTextView;
+        ImageView profilePic;
+        Button respondButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            titleTextView = itemView.findViewById(R.id.title_text_view);
+            profilePic = itemView.findViewById(R.id.image_view);
+            respondButton = itemView.findViewById(R.id.respond_button);
         }
 
-    }
-
-    public class SentReqViewHolder extends ViewHolder {
-
-//        TextView from;
-//        TextView to;
-//        TextView status;
-        TextView name;
-        ImageView photo;
-        RelativeLayout parentLayout;
-
-        public SentReqViewHolder(View itemView) {
-            super(itemView);
-            photo = itemView.findViewById(R.id.user_Image);
-            name = itemView.findViewById(R.id.user_Name);
-            parentLayout = itemView.findViewById(R.id.parent_layout);
-
+        public void clearViewHolder() {
+            titleTextView.setText(null);
         }
 
-    }
-    public class ReceivedReqViewHolder extends ViewHolder{
-
-//        TextView from;
-//        TextView to;
-//        TextView status;
-        TextView name;
-        ImageView photo;
-        RelativeLayout parentLayout;
-
-        public ReceivedReqViewHolder(View itemView) {
-            super(itemView);
-            photo = itemView.findViewById(R.id.user_Image);
-            name = itemView.findViewById(R.id.user_Name);
-            parentLayout = itemView.findViewById(R.id.parent_layout);
+        public void setViewHolder(User user) {
+            titleTextView.setText(user.name);
+            Glide.with(mContext)
+                    .load(user.photoUrl)
+                    .into(profilePic);
 
         }
-
     }
 }
 
