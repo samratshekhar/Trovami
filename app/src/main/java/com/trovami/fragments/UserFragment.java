@@ -1,11 +1,11 @@
 package com.trovami.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +29,6 @@ import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,11 +37,13 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
 
     private UserFragmentListener mListener;
     private FirebaseAuth mAuth;
-    private ProgressDialog mDialog;
     private List<User> mUnfolllowedUsers = new ArrayList<>();
     private List<String> mSentReq = new ArrayList<>();
     private User mCurrentUser;
     private UserAdapter mAdapter;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private SwipeRefreshLayout.OnRefreshListener mSwipeListener;
 
     public UserFragment() {
         // Required empty public constructor
@@ -57,10 +58,6 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        mDialog = new ProgressDialog(getContext());
-        mDialog.setMessage("Logging in...");
-        mDialog.setCancelable(false);
-        mDialog.show();
         setupFirebaseAuth();
         fetchNotifications();
     }
@@ -72,23 +69,23 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                 if(iterator.hasNext()) {
-                    // notifications found, fetch followers and following
+                    // notifications found, fetch current user
                     DataSnapshot singleSnapshot = iterator.next();
                     Notification notification = singleSnapshot.getValue(Notification.class);
                     if (notification.to != null) {
                         mSentReq.clear();
                         mSentReq.addAll(notification.to.keySet());
                     }
-                } else {
-                    //TODO: handle no notifications here
                 }
                 fetchCurrentUser();
-                mDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //TODO: handle no notifications here
-                mDialog.dismiss();
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
             }
         };
         Notification.getNotificationsById(currentUser.getUid(), listener);
@@ -101,18 +98,24 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                 if(iterator.hasNext()) {
-                    // user found, fetch followers and following
+                    // user found, fetch already following
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
                     fetchUnfollowedUsers();
                 } else {
-                    // TODO: handle user req here
+                    if (mSwipeRefreshLayout.isRefreshing()){
+                        Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle user req here
-                mDialog.dismiss();
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
             }
         };
         User.getUserById(currentUser.getUid(), listener);
@@ -123,21 +126,29 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mUnfolllowedUsers.clear();
-                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                    User user = singleSnapshot.getValue(User.class);
-                    boolean isUnfollowing = isUnfollowed(user.uid);
-                    if(isUnfollowing) {
-                        mUnfolllowedUsers.add(user);
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if(iterator.hasNext()) {
+                    while (iterator.hasNext()) {
+                        DataSnapshot singleSnapshot = iterator.next();
+                        User user = singleSnapshot.getValue(User.class);
+                        boolean isUnfollowing = isUnfollowed(user.uid);
+                        if(isUnfollowing) {
+                            mUnfolllowedUsers.add(user);
+                        }
                     }
                 }
-                // TODO: update adapter here;
                 mAdapter.notifyDataSetChanged();
-                mDialog.dismiss();
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getActivity(), "Refreshed!", Toast.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
-                mDialog.dismiss();
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
         };
         User.getUsers(listener);
@@ -162,19 +173,46 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
         receiverRef.child(mCurrentUser.uid).setValue(mCurrentUser.uid);
 
-        Toast.makeText(getContext(), "Request sent.",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Request sent.",Toast.LENGTH_SHORT).show();
+        startRefresh();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user, container, false);
-        RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
-        mAdapter = new UserAdapter(getContext(), mUnfolllowedUsers, this);
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        setupListView(v);
+        setupSwipeRefresh(v);
         return v;
+    }
+
+    private void setupListView(View v) {
+        RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
+        mAdapter = new UserAdapter(getActivity(), mUnfolllowedUsers, this);
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    private void setupSwipeRefresh(View v) {
+        mSwipeRefreshLayout = v.findViewById(R.id.swipe_layout);
+        mSwipeListener  = new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchNotifications();
+            }
+        };
+        mSwipeRefreshLayout.setOnRefreshListener(mSwipeListener);
+        startRefresh();
+    }
+
+    private void startRefresh() {
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                mSwipeListener.onRefresh();
+            }
+        });
     }
 
     private void setupFirebaseAuth() {
@@ -197,7 +235,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
 
     @Override
     public void onActionClicked(final User user) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle("Send follow request to " + user.name);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
