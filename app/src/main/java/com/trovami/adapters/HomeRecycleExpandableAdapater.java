@@ -6,10 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bignerdranch.expandablerecyclerview.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
-import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
-import com.bignerdranch.expandablerecyclerview.model.Parent;
 import com.trovami.R;
 import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
@@ -42,13 +39,13 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
 
     @Override
     public HomeGroupViewHolder onCreateParentViewHolder(@NonNull ViewGroup parentViewGroup, int viewType) {
-        View groupView = mInflater.inflate(R.layout.list_group, parentViewGroup, false);
+        View groupView = mInflater.inflate(R.layout.list_home_header, parentViewGroup, false);
         return new HomeGroupViewHolder(groupView);
     }
 
     @Override
     public HomeItemViewHolder onCreateChildViewHolder(@NonNull ViewGroup childViewGroup, int viewType) {
-        View itemView = mInflater.inflate(R.layout.list_item, childViewGroup, false);
+        View itemView = mInflater.inflate(R.layout.list_home_item, childViewGroup, false);
         return new HomeItemViewHolder(itemView, mListener);
     }
 
