@@ -2,10 +2,12 @@ package com.trovami.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class NotificationFragment extends Fragment {
+public class NotificationFragment extends Fragment implements NotificationAdapter.NotificationActionListener {
 
     private static final String TAG = "NotificationFragment";
 
@@ -91,7 +93,7 @@ public class NotificationFragment extends Fragment {
                         mReceivedReq.addAll(notification.from.keySet());
                     }
                 }
-                updateListView();
+                updateListView(mTabLayout.getSelectedTabPosition() == 0);
                 dismissRefresh("Refreshed!");
             }
             @Override
@@ -102,13 +104,13 @@ public class NotificationFragment extends Fragment {
         Notification.getNotificationsById(currentUser.getUid(), listener);
     }
 
-    private void acceptRequest(User user) {
+    private void acceptRequest(String uid) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         // TODO: update following list
         DatabaseReference followingRef = database
                 .child(RDBSchema.Users.TABLE_NAME)
-                .child(user.uid)
+                .child(uid)
                 .child(RDBSchema.Users.FOLLOWING);
         followingRef.
                 child(currentUser.getUid())
@@ -119,12 +121,12 @@ public class NotificationFragment extends Fragment {
                 .child(currentUser.getUid())
                 .child(RDBSchema.Users.FOLLOWER);
         followerRef
-                .child(user.uid)
-                .setValue(user.uid);
-        deleteRequest(user);
+                .child(uid)
+                .setValue(uid);
+        deleteRequest(uid);
     }
 
-    private void deleteRequest(User user) {
+    private void deleteRequest(String uid) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         // TODO: remove from notification
@@ -132,12 +134,12 @@ public class NotificationFragment extends Fragment {
                 .child(RDBSchema.Notification.TABLE_NAME)
                 .child(currentUser.getUid())
                 .child(RDBSchema.Notification.FROM);
-        senderRef.child(user.uid).removeValue();
+        senderRef.child(uid).removeValue();
 
         // TODO: remove to notification
         DatabaseReference receiverRef = database
                 .child(RDBSchema.Notification.TABLE_NAME)
-                .child(user.uid)
+                .child(uid)
                 .child(RDBSchema.Notification.TO);
         receiverRef.child(currentUser.getUid()).removeValue();
     }
@@ -159,13 +161,7 @@ public class NotificationFragment extends Fragment {
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mDisplayList.clear();
-                if (tab.getPosition() == 0) {
-                    mDisplayList.addAll(mReceivedReq);
-                } else {
-                    mDisplayList.addAll(mSentReq);
-                }
-                mAdapter.notifyDataSetChanged();
+                updateListView(tab.getPosition() == 0);
             }
 
             @Override
@@ -180,19 +176,20 @@ public class NotificationFragment extends Fragment {
         });
     }
 
-    private void updateListView() {
+    private void updateListView(boolean isReceivedSelected) {
         mDisplayList.clear();
-        if (mTabLayout.getSelectedTabPosition() == 0) {
+        if (isReceivedSelected) {
             mDisplayList.addAll(mReceivedReq);
         } else {
             mDisplayList.addAll(mSentReq);
         }
+        mAdapter.setmIsReceivedSelected(isReceivedSelected);
         mAdapter.notifyDataSetChanged();
     }
 
     private void setupListView(View v) {
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view);
-        mAdapter = new NotificationAdapter(getActivity(), mDisplayList, mUserMap);
+        mAdapter = new NotificationAdapter(getActivity(), mDisplayList, mUserMap, this, true);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -242,6 +239,23 @@ public class NotificationFragment extends Fragment {
         super.onDetach();
         Log.d(TAG, "onDetach");
         mListener = null;
+    }
+
+    @Override
+    public void onActionClicked(String uid) {
+        final User user = mUserMap.get(uid);
+        if (user != null) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+            alertDialogBuilder.setTitle("Respond to follow request by " + user.name);
+            alertDialogBuilder.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+//                    acceptRequest(user.uid);
+                }
+            });
+            alertDialogBuilder.setNegativeButton("Reject", null);
+            alertDialogBuilder.create().show();
+        }
     }
 
     public interface NotificationFragmentListener {

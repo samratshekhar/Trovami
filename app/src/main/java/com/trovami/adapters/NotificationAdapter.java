@@ -33,24 +33,38 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder>{
     private static final String TAG = "NotificationAdapter";
-    private static final int SentReq = 1;
-    private static final int ReceivedReq = 2;
+
+    private Context mContext;
 
     private List<String> mReqList = new ArrayList<>();
-    private Context mContext;
     private HashMap<String, User> mUserMap;
 
-    public NotificationAdapter(Context context, List<String> reqList, HashMap<String, User> userMap) {
+    public void setmIsReceivedSelected(boolean mIsReceivedSelected) {
+        this.mIsReceivedSelected = mIsReceivedSelected;
+    }
+
+    private boolean mIsReceivedSelected = true;
+
+    private NotificationActionListener mListener;
+
+    public NotificationAdapter(
+            Context context,
+            List<String> reqList,
+            HashMap<String, User> userMap,
+            NotificationActionListener listener,
+            boolean isReceivedSelected) {
         this.mReqList = reqList;
         this.mContext = context;
         this.mUserMap = userMap;
+        this.mListener = listener;
+        this.mIsReceivedSelected = isReceivedSelected;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_notification_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return  vh;
     }
@@ -58,7 +72,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: called");
-        User user = mUserMap.get(mReqList.get(position));
+        final String uid = mReqList.get(position);
+        bindDataToHolder(holder, uid);
+        setClickListener(holder, uid);
+    }
+
+    private void bindDataToHolder(final ViewHolder holder, String uid) {
+        User user = mUserMap.get(uid);
         if (user != null) {
             holder.setViewHolder(user);
         } else {
@@ -77,8 +97,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 @Override
                 public void onCancelled(DatabaseError databaseError) {}
             };
-            User.getUserById(mReqList.get(position), listener);
+            User.getUserById(uid, listener);
         }
+    }
+
+    private void setClickListener(final ViewHolder holder, final String uid) {
+        holder.respondButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onActionClicked(uid);
+            }
+        });
     }
 
     @Override
@@ -104,12 +133,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void setViewHolder(User user) {
-            titleTextView.setText(user.name);
+            if (!mIsReceivedSelected) {
+                respondButton.setVisibility(View.GONE);
+                titleTextView.setText("You requested to follow " + user.name + ".");
+            } else {
+                respondButton.setVisibility(View.VISIBLE);
+                titleTextView.setText(user.name + " requested to follow you.");
+            }
             Glide.with(mContext)
                     .load(user.photoUrl)
                     .into(profilePic);
 
         }
+    }
+
+    public interface NotificationActionListener {
+        void onActionClicked(String uid);
     }
 }
 
