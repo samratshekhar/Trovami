@@ -26,15 +26,20 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
     private Context mContext;
     private LayoutInflater mInflater;
     private HashMap<String, User> mUserMap;
+    private HomeItemViewHolder.HomeItemViewListener mListener;
 
-    public HomeRecycleExpandableAdapater(Context context, @NonNull List<HomeGroup> homeGroups, HashMap<String, User> userMap) {
+    public HomeRecycleExpandableAdapater(
+            Context context,
+            @NonNull List<HomeGroup> homeGroups,
+            HashMap<String, User> userMap,
+            HomeItemViewHolder.HomeItemViewListener listener) {
         super(homeGroups);
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mUserMap = userMap;
+        mListener = listener;
     }
 
-    // onCreate ...
     @Override
     public HomeGroupViewHolder onCreateParentViewHolder(@NonNull ViewGroup parentViewGroup, int viewType) {
         View groupView = mInflater.inflate(R.layout.list_group, parentViewGroup, false);
@@ -44,10 +49,9 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
     @Override
     public HomeItemViewHolder onCreateChildViewHolder(@NonNull ViewGroup childViewGroup, int viewType) {
         View itemView = mInflater.inflate(R.layout.list_item, childViewGroup, false);
-        return new HomeItemViewHolder(itemView);
+        return new HomeItemViewHolder(itemView, mListener);
     }
 
-    // onBind ...
     @Override
     public void onBindParentViewHolder(@NonNull HomeGroupViewHolder hgViewHolder, int parentPosition, @NonNull HomeGroup hg) {
         hgViewHolder.bind(hg);

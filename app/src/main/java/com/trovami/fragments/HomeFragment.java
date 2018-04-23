@@ -2,6 +2,7 @@ package com.trovami.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
+import com.trovami.activities.ProfileActivity;
+import com.trovami.adapters.HomeItemViewHolder;
 import com.trovami.adapters.HomeRecycleExpandableAdapater;
 import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
@@ -34,7 +37,7 @@ import java.util.List;
  * Created by samrat on 27/01/18.
  */
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeItemViewListener {
 
     private static final String TAG = "NotificationFragment";
 
@@ -46,7 +49,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private HashMap<String, User> userMap = new HashMap<>();
+    private HashMap<String, User> mUserMap = new HashMap<>();
     private List<HomeGroup> mGrouplist = new ArrayList<>();
 
     public HomeFragment() {
@@ -88,8 +91,7 @@ public class HomeFragment extends Fragment {
 
         mGrouplist.add(new HomeGroup("Following",new ArrayList<String>()));
         mGrouplist.add(new HomeGroup("Followers",new ArrayList<String>()));
-
-        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist, userMap);
+        mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist, mUserMap, this);
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -181,5 +183,20 @@ public class HomeFragment extends Fragment {
 
     public interface HomeFragmentListener {
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onItemClicked(String uid) {
+        User user = mUserMap.get(uid);
+        if (user != null){
+            Intent intent = new Intent(getContext(), ProfileActivity.class);
+            intent.putExtra("user", user);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onActionClicked(String uid) {
+
     }
 }

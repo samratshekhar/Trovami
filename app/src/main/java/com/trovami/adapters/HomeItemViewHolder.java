@@ -25,22 +25,27 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class HomeItemViewHolder extends ChildViewHolder {
+    private HomeItemViewListener mClickListener;
     private TextView txtItemTitle;
     private  TextView txtItemSubtitle;
     private CircleImageView cimgPhoto;
     private LinearLayout layoutListParent;
     private Button btnTrack;
 
-    public HomeItemViewHolder(View itemView) {
+    public HomeItemViewHolder(View itemView, HomeItemViewListener clickLister) {
         super(itemView);
         txtItemTitle = itemView.findViewById(R.id.tV_ListTitle);
         txtItemSubtitle = itemView.findViewById(R.id.tV_ListSubtitle);
         cimgPhoto=itemView.findViewById(R.id.cImg_ListPhoto);
         layoutListParent=itemView.findViewById(R.id.linear_ItemParent);
         btnTrack=itemView.findViewById(R.id.btn_listbtn);
+        mClickListener = clickLister;
     }
 
-    public void bind(final Context context, final String uid, final HashMap<String, User> userMap) {
+    public void bind(
+            final Context context,
+            final String uid,
+            final HashMap<String, User> userMap) {
         User existingUser = userMap.get(uid);
         if (existingUser != null) {
             bindUserData(context, existingUser);
@@ -69,14 +74,14 @@ public class HomeItemViewHolder extends ChildViewHolder {
         layoutListParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"List item for user " + uid, Toast.LENGTH_SHORT).show();
+                mClickListener.onItemClicked(uid);
             }
         });
 
         btnTrack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Button for user " + uid, Toast.LENGTH_SHORT).show();
+                mClickListener.onActionClicked(uid);
             }
         });
     }
@@ -97,5 +102,12 @@ public class HomeItemViewHolder extends ChildViewHolder {
     private void clearUserData() {
         txtItemTitle.setText(null);
         txtItemSubtitle.setText(null);
+
+    }
+
+    public interface HomeItemViewListener {
+        void onItemClicked(String uid);
+        void onActionClicked(String uid);
+
     }
 }
