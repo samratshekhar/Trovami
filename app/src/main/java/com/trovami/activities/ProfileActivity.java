@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.R;
@@ -40,6 +41,10 @@ public class ProfileActivity extends AppCompatActivity {
             mBinding.nameEditText.setText(mUser.name);
             mBinding.emailEditText.setText(mUser.email);
             mBinding.phoneEditText.setText(mUser.phone);
+            Glide.with(this)
+                    .asBitmap()
+                    .load(mUser.photoUrl)
+                    .into(mBinding.profileImage);
         }
         if (!mIsUpdate) {
             mBinding.nameEditText.setFocusable(false);
