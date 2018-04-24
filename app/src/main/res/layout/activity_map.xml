@@ -6,9 +6,10 @@
     android:layout_height="match_parent"
     tools:context="com.trovami.activities.MapActivity">
 
-    <fragment
-        android:id="@+id/fragment"
-        android:name="com.trovami.fragments.MapFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.MapFragment"/>
 </android.support.constraint.ConstraintLayout>

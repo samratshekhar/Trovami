@@ -15,19 +15,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "161560245334-b91uj65housm0eebks56jm0l3saq0c66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trovami",
+            "certificate_hash": "ff55be447d821892791704b22f05f760740b27d0"
+          }
+        },
+        {
+          "client_id": "161560245334-3t30tq1f8n7aa370obkq1fs9kkjjf1t7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trovami",
+            "certificate_hash": "56e1013b447b7d189b755b75d5354cc2bb851f8a"
+          }
+        },
+        {
           "client_id": "161560245334-o0cap383oqu718k3ptcj5q622bitd8ds.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.trovami",
             "certificate_hash": "a08a5a7828edbf52b2437f670b7158a34b100934"
-          }
-        },
-        {
-          "client_id": "161560245334-pmpq06tj6ohiuurf9shei98gkqdslib6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.trovami",
-            "certificate_hash": "d83ae78eac28b0aa61704db8a6513aa03f7f9eb8"
           }
         },
         {
