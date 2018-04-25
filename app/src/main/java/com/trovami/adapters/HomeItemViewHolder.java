@@ -99,7 +99,7 @@ public class HomeItemViewHolder extends ChildViewHolder {
     }
 
     private void clearUserData() {
-        txtItemTitle.setText(null);
+        txtItemTitle.setText("Loading...");
         txtItemSubtitle.setText(null);
 
     }

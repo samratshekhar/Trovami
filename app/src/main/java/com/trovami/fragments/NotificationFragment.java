@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,6 +52,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SwipeRefreshLayout.OnRefreshListener mSwipeListener;
 
+    private TextView mNoRequestTextView;
     private TabLayout mTabLayout;
 
     public NotificationFragment() {
@@ -181,6 +183,11 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         } else {
             mDisplayList.addAll(mSentReq);
         }
+        if (mDisplayList.isEmpty()) {
+            mNoRequestTextView.setVisibility(View.VISIBLE);
+        } else {
+            mNoRequestTextView.setVisibility(View.GONE);
+        }
         mAdapter.setmIsReceivedSelected(isReceivedSelected);
         mAdapter.notifyDataSetChanged();
     }
@@ -190,6 +197,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         mAdapter = new NotificationAdapter(getActivity(), mDisplayList, mUserMap, this, true);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mNoRequestTextView = v.findViewById(R.id.no_req_text_view);
     }
 
     private void setupSwipeRefresh(View v) {

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -82,13 +83,37 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
 
     private void setupListView(View v) {
         if (mGrouplist.isEmpty()) {
-            mGrouplist.add(new HomeGroup("You're following",new ArrayList<String>()));
-            mGrouplist.add(new HomeGroup("Your followers",new ArrayList<String>()));
+            mGrouplist.add(new HomeGroup("You're following (0)",new ArrayList<String>()));
+            mGrouplist.add(new HomeGroup("Your followers (0)",new ArrayList<String>()));
         }
         mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist, mUserMap, this);
+        mHomeRecycleExpandableAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
+            @Override
+            public void onParentExpanded(int parentPosition) {
+                showEmptyText(parentPosition);
+            }
+
+            @Override
+            public void onParentCollapsed(int parentPosition) {
+                showEmptyText(parentPosition);
+            }
+        });
+
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
+    private void showEmptyText(int parentPosition) {
+        if (parentPosition == 0) {
+            if (mCurrentUser.following == null || mCurrentUser.following.keySet().isEmpty()) {
+                Toast.makeText(getContext(), "You're not following anybody!", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (mCurrentUser.follower == null || mCurrentUser.follower.keySet().isEmpty()) {
+                Toast.makeText(getContext(), "You're not being followed yet!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void setupSwipeRefreshLayout(View v) {
@@ -126,13 +151,19 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
+                    mGrouplist.get(0).getChildList().clear();
+                    mGrouplist.get(1).getChildList().clear(); //to avoid duplication when screen refreshed
                     if (mCurrentUser.following != null) {
-                        mGrouplist.get(0).getChildList().clear(); //to avoid duplication when screen refreshed
+                        mGrouplist.get(0).setGroupName("You're following (" + mCurrentUser.following.keySet().size() + ")");
                         mGrouplist.get(0).getChildList().addAll(mCurrentUser.following.keySet());
+                    } else {
+                        mGrouplist.get(0).setGroupName("You're following (0)");
                     }
                     if (mCurrentUser.follower != null) {
-                        mGrouplist.get(1).getChildList().clear(); //to avoid duplication when screen refreshed
+                        mGrouplist.get(1).setGroupName("Your followers (" + mCurrentUser.follower.keySet().size() + ")");
                         mGrouplist.get(1).getChildList().addAll(mCurrentUser.follower.keySet());
+                    } else {
+                        mGrouplist.get(1).setGroupName("Your followers (0)");
                     }
                     mHomeRecycleExpandableAdapter.notifyParentDataSetChanged(true);
                 } else {

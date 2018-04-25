@@ -10,6 +10,10 @@ import java.util.List;
 
 public class HomeGroup implements Parent<String> {
 
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
     private String groupName;
     private List<String> userIDs;
 

@@ -129,7 +129,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void clearViewHolder() {
-            titleTextView.setText(null);
+            titleTextView.setText("Loading...");
         }
 
         public void setViewHolder(User user) {
