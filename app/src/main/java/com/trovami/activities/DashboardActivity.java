@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -51,18 +52,13 @@ public class DashboardActivity extends AppCompatActivity
     private NotificationFragment mNotificationFragment;
     private UserFragment mUserFragment;
 
+    private boolean mDoubleBackToExitPressedOnce = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setupUI();
-        if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION }, 1);
-            Intent intent = new Intent(this, LocationFetchService.class);
-            startService(intent);
-        } else {
-            Log.d(TAG, "Service up");
-        }
+        setupLocationService();
         setupFirebaseAuth();
         fetchCurrentUser();
     }
@@ -99,6 +95,21 @@ public class DashboardActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+        if(mHomeFragment == null) {
+            mHomeFragment = HomeFragment.newInstance();
+        }
+        setFragment(mHomeFragment);
+    }
+
+    private void setupLocationService() {
+        if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION }, 1);
+            Intent intent = new Intent(this, LocationFetchService.class);
+            startService(intent);
+        } else {
+            Log.d(TAG, "Service up");
+        }
     }
 
     private void fetchCurrentUser() {
@@ -171,7 +182,20 @@ public class DashboardActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (mDoubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+            this.mDoubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    mDoubleBackToExitPressedOnce=false;
+                }
+            }, 2000);
         }
     }
 
@@ -219,6 +243,13 @@ public class DashboardActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             logout();
         }
+        setFragment(fragment);
+        mBinding.drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void setFragment(Fragment fragment) {
+
 
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -226,8 +257,5 @@ public class DashboardActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

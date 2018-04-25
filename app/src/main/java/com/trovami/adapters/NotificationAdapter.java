@@ -123,9 +123,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.title_text_view);
-            profilePic = itemView.findViewById(R.id.image_view);
-            respondButton = itemView.findViewById(R.id.respond_button);
+            titleTextView = itemView.findViewById(R.id.notification_item_title_text_view);
+            profilePic = itemView.findViewById(R.id.notification_item_profile_image_view);
+            respondButton = itemView.findViewById(R.id.notification_item_respond_button);
         }
 
         public void clearViewHolder() {

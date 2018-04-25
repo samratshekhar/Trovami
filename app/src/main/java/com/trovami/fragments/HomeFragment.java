@@ -82,8 +82,8 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
 
     private void setupListView(View v) {
         if (mGrouplist.isEmpty()) {
-            mGrouplist.add(new HomeGroup("Following",new ArrayList<String>()));
-            mGrouplist.add(new HomeGroup("Followers",new ArrayList<String>()));
+            mGrouplist.add(new HomeGroup("You're following",new ArrayList<String>()));
+            mGrouplist.add(new HomeGroup("Your followers",new ArrayList<String>()));
         }
         mHomeRecycleExpandableAdapter = new HomeRecycleExpandableAdapater(getContext(),mGrouplist, mUserMap, this);
         mRecyclerView= v.findViewById(R.id.recyclerView_home);

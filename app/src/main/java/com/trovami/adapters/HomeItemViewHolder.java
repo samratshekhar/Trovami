@@ -3,9 +3,8 @@ package com.trovami.adapters;
 import android.content.Context;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.ChildViewHolder;
 import com.bumptech.glide.Glide;
@@ -27,18 +26,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeItemViewHolder extends ChildViewHolder {
     private HomeItemViewListener mClickListener;
     private TextView txtItemTitle;
-    private  TextView txtItemSubtitle;
+    private TextView txtItemSubtitle;
     private CircleImageView cimgPhoto;
-    private LinearLayout layoutListParent;
+    private RelativeLayout layoutListParent;
     private Button btnTrack;
 
     public HomeItemViewHolder(View itemView, HomeItemViewListener clickLister) {
         super(itemView);
-        txtItemTitle = itemView.findViewById(R.id.tV_ListTitle);
-        txtItemSubtitle = itemView.findViewById(R.id.tV_ListSubtitle);
-        cimgPhoto=itemView.findViewById(R.id.cImg_ListPhoto);
-        layoutListParent=itemView.findViewById(R.id.linear_ItemParent);
-        btnTrack=itemView.findViewById(R.id.btn_listbtn);
+        txtItemTitle = itemView.findViewById(R.id.home_item_title_text_view);
+        txtItemSubtitle = itemView.findViewById(R.id.home_item_subtitle_text_view);
+        cimgPhoto=itemView.findViewById(R.id.home_item_profile_image_view);
+        layoutListParent=itemView.findViewById(R.id.home_item_parent_layout);
+        btnTrack=itemView.findViewById(R.id.home_item_track_button);
         mClickListener = clickLister;
     }
 

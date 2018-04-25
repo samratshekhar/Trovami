@@ -16,7 +16,7 @@ public class HomeGroupViewHolder extends ParentViewHolder {
 
     public HomeGroupViewHolder(View itemView) {
         super(itemView);
-        txtGroupTitle = itemView.findViewById(R.id.lblListHeader);
+        txtGroupTitle = itemView.findViewById(R.id.home_group_title_text_view);
     }
 
     public void bind(HomeGroup hg) {
