@@ -91,7 +91,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                     }
                 }
                 updateListView(mTabLayout.getSelectedTabPosition() == 0);
-                dismissRefresh("Refreshed!");
+                dismissRefresh("Refreshed notifications!");
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -139,6 +139,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
                 .child(uid)
                 .child(RDBSchema.Notification.TO);
         receiverRef.child(currentUser.getUid()).removeValue();
+        startRefresh();
     }
 
     @Override

@@ -133,7 +133,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
                 }
                 mAdapter.notifyDataSetChanged();
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getActivity(), "Refreshed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Refreshed user list!", Toast.LENGTH_SHORT).show();
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }

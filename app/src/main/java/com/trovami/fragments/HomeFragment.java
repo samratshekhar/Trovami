@@ -44,9 +44,9 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     private HomeFragmentListener mListener;
     private FirebaseAuth mAuth;
     private User mCurrentUser;
-    private ProgressDialog mDialog;
     private HomeRecycleExpandableAdapater mHomeRecycleExpandableAdapter;
     private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout.OnRefreshListener mSwipeListener;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private HashMap<String, User> mUserMap = new HashMap<>();
@@ -67,13 +67,7 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
-        mDialog = new ProgressDialog(getContext());
-        mDialog.setMessage("Logging in...");
-        mDialog.setCancelable(false);
-        mDialog.show();
         setupFirebaseAuth();
-        fetchCurrentUser();
     }
 
     @Override
@@ -99,10 +93,21 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
 
     private void setupSwipeRefreshLayout(View v) {
         mSwipeRefreshLayout = v.findViewById(R.id.swipeLayout);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipeListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 fetchCurrentUser();
+            }
+        };
+        mSwipeRefreshLayout.setOnRefreshListener(mSwipeListener);
+        startRefresh();
+    }
+
+    private void startRefresh() {
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override public void run() {
+                mSwipeRefreshLayout.setRefreshing(true);
+                mSwipeListener.onRefresh();
             }
         });
     }
@@ -134,17 +139,13 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                     // user not found, create one
                     createFirebaseUser();
                 }
-                mDialog.dismiss();
-
                 if (mSwipeRefreshLayout.isRefreshing()){
+                    Toast.makeText(getContext(), "Refreshed trackers!", Toast.LENGTH_SHORT).show();
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO: handle error
-                mDialog.dismiss();
-
                 if (mSwipeRefreshLayout.isRefreshing()){
                     Toast.makeText(getContext(), "Could not refresh data", Toast.LENGTH_SHORT).show();
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -162,7 +163,10 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
         User.setUserById(user, currentUser.getUid());
-        mDialog.dismiss();
+        if (mSwipeRefreshLayout.isRefreshing()){
+            Toast.makeText(getContext(), "Refreshed trackers!", Toast.LENGTH_SHORT).show();
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
 
