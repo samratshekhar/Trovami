@@ -59,7 +59,6 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setupFirebaseAuth();
-        fetchNotifications();
     }
 
     private void fetchNotifications() {
@@ -67,15 +66,10 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                if(iterator.hasNext()) {
-                    // notifications found, fetch current user
-                    DataSnapshot singleSnapshot = iterator.next();
-                    Notification notification = singleSnapshot.getValue(Notification.class);
-                    if (notification.to != null) {
-                        mSentReq.clear();
-                        mSentReq.addAll(notification.to.keySet());
-                    }
+                Notification notification = dataSnapshot.getValue(Notification.class);
+                mSentReq.clear();
+                if (notification != null && notification.to != null) {
+                    mSentReq.addAll(notification.to.keySet());
                 }
                 fetchCurrentUser();
             }
@@ -155,7 +149,10 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
     }
 
     private boolean isUnfollowed(String uid) {
-        boolean isAlreadyFollowing = mCurrentUser.following.containsKey(uid);
+        boolean isAlreadyFollowing = false;
+        if (mCurrentUser.following != null) {
+            isAlreadyFollowing = mCurrentUser.following.containsKey(uid);
+        }
         boolean isReqSent = mSentReq.contains(uid);
         boolean isCurrentUser = mCurrentUser.uid.equals(uid);
         if (isAlreadyFollowing || isReqSent || isCurrentUser) return false;

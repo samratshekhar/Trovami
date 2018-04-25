@@ -26,9 +26,9 @@ public class Notification implements Parcelable {
 
     public static void getNotificationsById(String uid, ValueEventListener listener) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = database.child(RDBSchema.Notification.TABLE_NAME);
-        Query phoneQuery = ref.orderByChild(RDBSchema.Notification.UID);
-        phoneQuery.addListenerForSingleValueEvent(listener);
+        DatabaseReference ref = database.child(RDBSchema.Notification.TABLE_NAME).child(uid);
+        Query phoneQuery = ref.equalTo(uid);
+        ref.addListenerForSingleValueEvent(listener);
         return;
     }
 

@@ -79,17 +79,14 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                if(iterator.hasNext()) {
-                    // notifications found, fetch followers and following
-                    DataSnapshot singleSnapshot = iterator.next();
-                    Notification notification = singleSnapshot.getValue(Notification.class);
+                Notification notification = dataSnapshot.getValue(Notification.class);
+                mSentReq.clear();
+                mReceivedReq.clear();
+                if (notification != null) {
                     if (notification.to != null) {
-                        mSentReq.clear();
                         mSentReq.addAll(notification.to.keySet());
                     }
                     if (notification.from != null) {
-                        mReceivedReq.clear();
                         mReceivedReq.addAll(notification.from.keySet());
                     }
                 }
@@ -250,10 +247,15 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
             alertDialogBuilder.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-//                    acceptRequest(user.uid);
+                    acceptRequest(user.uid);
                 }
             });
-            alertDialogBuilder.setNegativeButton("Reject", null);
+            alertDialogBuilder.setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteRequest(user.uid);
+                }
+            });
             alertDialogBuilder.create().show();
         }
     }
