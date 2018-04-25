@@ -20,7 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -101,7 +103,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private void fetchCurrentUser() {
         if (mCurrentUser != null) {
-            updateUI();
+            updateUI(mCurrentUser);
         } else {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             ValueEventListener listener = new ValueEventListener() {
@@ -112,7 +114,9 @@ public class DashboardActivity extends AppCompatActivity
                         // user found, fetch followers and following
                         DataSnapshot singleSnapshot = iterator.next();
                         mCurrentUser = singleSnapshot.getValue(User.class);
-                        updateUI();
+                        updateUI(mCurrentUser);
+                    } else {
+                        createFirebaseUser();
                     }
                 }
                 @Override
@@ -124,7 +128,18 @@ public class DashboardActivity extends AppCompatActivity
         }
     }
 
-    private void updateUI() {
+    private void createFirebaseUser() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        User user = new User();
+        user.email = currentUser.getEmail();
+        user.name = currentUser.getDisplayName();
+        user.photoUrl = currentUser.getPhotoUrl().toString();
+        user.uid = currentUser.getUid();
+        User.setUserById(user, currentUser.getUid());
+        updateUI(user);
+    }
+
+    private void updateUI(final User user) {
         final Activity activity = this;
         // TODO: update porfile pic
         View headerView =  mBinding.navView.getHeaderView(0);
@@ -132,13 +147,16 @@ public class DashboardActivity extends AppCompatActivity
         TextView nameTextView = headerView.findViewById(R.id.nav_title_text_view);
         TextView emailTextView = headerView.findViewById(R.id.nav_subtitle_text_view);
 
-        nameTextView.setText(mCurrentUser.name);
-        emailTextView.setText(mCurrentUser.email);
+        nameTextView.setText(user.name);
+        emailTextView.setText(user.email);
+        Glide.with(getBaseContext())
+                .load(user.photoUrl)
+                .into(profileImageView);
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, ProfileActivity.class);
-                intent.putExtra("user", mCurrentUser);
+                intent.putExtra("user", user);
                 intent.putExtra("isUpdate", true);
                 startActivity(intent);
                 mBinding.drawerLayout.closeDrawer(GravityCompat.START);
