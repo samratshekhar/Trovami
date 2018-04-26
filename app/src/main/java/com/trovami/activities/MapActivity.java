@@ -2,10 +2,9 @@ package com.trovami.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -17,11 +16,13 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -42,10 +43,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
+import com.trovami.databinding.ActivityMapBinding;
 import com.trovami.models.LatLong;
 import com.trovami.models.User;
-
-import android.util.Log;
+import com.trovami.utils.Utils;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, LocationListener {
 
@@ -53,6 +54,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int REQ_PERMISSION = 123;
 
 
+    private ActivityMapBinding mBinding;
     private MapView mMapView;
     private GoogleMap map;
     private LatLng mOwnLocation;
@@ -94,15 +96,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void setupUI(Bundle savedInstanceState) {
         setContentView(R.layout.activity_map);
-        mMapView = (MapView) findViewById(R.id.mapView);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_map);
+        mMapView = mBinding.mapView;
         mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(this); //this is important
+        mMapView.getMapAsync(this);
     }
 
     private void setupData() {
         Intent intent = getIntent();
         mUser = intent.getParcelableExtra("user");
         mCurrentUSer = intent.getParcelableExtra("currentUser");
+        mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
+        mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
+        mBinding.mapTextContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomMap();
+            }
+        });
     }
 
     private void setupMap(GoogleMap googleMap) {

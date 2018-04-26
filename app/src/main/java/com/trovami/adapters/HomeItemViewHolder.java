@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.models.User;
+import com.trovami.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,7 +89,7 @@ public class HomeItemViewHolder extends ChildViewHolder {
     private void bindUserData(Context context, User user) {
         txtItemTitle.setText(user.name);
         if (user.latLong != null && user.latLong.timeStamp != null) {
-            txtItemSubtitle.setText("Last seen: " + user.latLong.timeStamp);
+            txtItemSubtitle.setText("Last seen: " + Utils.formatDateTime(user.latLong.timeStamp));
         } else  {
             txtItemSubtitle.setText("Last seen: Unknown");
         }

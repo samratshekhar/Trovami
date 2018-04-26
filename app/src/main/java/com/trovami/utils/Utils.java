@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by samrat on 27/01/18.
  */
@@ -18,6 +22,18 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public static String formatDateTime(String date) {
+        SimpleDateFormat reader=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        try {
+            Date dateStr = reader.parse(date);
+            SimpleDateFormat writer = new SimpleDateFormat("E dd, h:m:s a");
+            return writer.format(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
