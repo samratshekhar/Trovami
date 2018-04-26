@@ -87,14 +87,6 @@ public class DashboardActivity extends AppCompatActivity
         toggle.syncState();
 
         mBinding.navView.setNavigationItemSelectedListener(this);
-
-        mBinding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MapActivity.class);
-                startActivity(intent);
-            }
-        });
         if(mHomeFragment == null) {
             mHomeFragment = HomeFragment.newInstance();
         }

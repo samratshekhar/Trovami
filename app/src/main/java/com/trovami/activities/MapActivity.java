@@ -1,5 +1,6 @@
 package com.trovami.activities;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -25,7 +26,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
+import com.trovami.models.LatLong;
 import com.trovami.models.User;
 
 import android.util.Log;
@@ -45,10 +52,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(this); //this is important
+        setupUI(savedInstanceState);
+        setupData();
     }
 
     @Override
@@ -73,6 +78,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         setupMap(googleMap);
         getOwnLocation();
+        startTrackingUser();
+    }
+
+    private void setupUI(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_map);
+        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this); //this is important
+    }
+
+    private void setupData() {
+        Intent intent = getIntent();
+        mUser = intent.getParcelableExtra("user");
     }
 
     private void setupMap(GoogleMap googleMap) {
@@ -83,6 +101,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setBuildingsEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setOnMarkerClickListener(this);
+    }
+
+    private void startTrackingUser() {
+        if (mUser != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mUser.uid).child("latLong");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "onDataChange: " + dataSnapshot);
+                    LatLong latLong = dataSnapshot.getValue(LatLong.class);
+                    Log.d(TAG, "latLong: " + latLong);
+                    clearMap();
+                    dropMarker(new LatLng(latLong.lat, latLong.lon), mUser.name);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    private void clearMap() {
+        map.clear();
     }
 
     private void dropMarker(LatLng latLng, String title) {
@@ -106,7 +149,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 mOwnLocation = new LatLng(latitude, longitude);
-                dropMarker(mOwnLocation, "You are Here!");
+                //dropMarker(mOwnLocation, "You are Here!");
             }
         } else {
             askPermission();

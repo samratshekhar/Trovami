@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
+import com.trovami.activities.MapActivity;
 import com.trovami.activities.ProfileActivity;
 import com.trovami.adapters.HomeItemViewHolder;
 import com.trovami.adapters.HomeRecycleExpandableAdapater;
@@ -232,6 +233,8 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
 
     @Override
     public void onActionClicked(String uid) {
-
+        Intent intent = new Intent(getContext(), MapActivity.class);
+        intent.putExtra("user", mUserMap.get(uid));
+        startActivity(intent);
     }
 }
