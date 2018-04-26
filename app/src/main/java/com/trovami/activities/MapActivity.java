@@ -3,7 +3,13 @@ package com.trovami.activities;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
@@ -17,6 +23,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -48,6 +58,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LatLng mOwnLocation;
     private MapFragmentListener mListener;
     private User mUser;
+    private User mCurrentUSer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +102,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void setupData() {
         Intent intent = getIntent();
         mUser = intent.getParcelableExtra("user");
+        mCurrentUSer = intent.getParcelableExtra("currentUser");
     }
 
     private void setupMap(GoogleMap googleMap) {
@@ -109,11 +121,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d(TAG, "onDataChange: " + dataSnapshot);
                     LatLong latLong = dataSnapshot.getValue(LatLong.class);
-                    Log.d(TAG, "latLong: " + latLong);
+                    mUser.latLong = latLong;
                     clearMap();
-                    dropMarker(new LatLng(latLong.lat, latLong.lon), mUser.name);
+                    dropMarker(mUser);
+                    dropMarker(mCurrentUSer);
+                    zoomMap();
                 }
 
                 @Override
@@ -128,14 +141,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.clear();
     }
 
-    private void dropMarker(LatLng latLng, String title) {
-        Drawable newDrawable = getResources().getDrawable(R.drawable.mapmarkerflag);
-        Bitmap markerIcon = drawableToBitmap(newDrawable);
-        Marker marker = map.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title(title)
-                .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)));
-        marker.setTag(0);
+    private void dropMarker(final User user) {
+        if (user.latLong != null) {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(user.photoUrl)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            Marker marker = map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(user.latLong.lat, user.latLong.lon))
+                                    .title(user.name)
+                                    .icon(BitmapDescriptorFactory.fromBitmap(getCroppedBitmap(resource))));
+                            marker.setTag(0);
+                        }
+                    });
+        }
+    }
+
+    private void zoomMap() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(new LatLng(mUser.latLong.lat, mUser.latLong.lon));
+        builder.include(new LatLng(mCurrentUSer.latLong.lat, mCurrentUSer.latLong.lon));
+        LatLngBounds bounds = builder.build();
+        int padding = 150; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        map.animateCamera(cu);
+    }
+
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
     }
 
     private void getOwnLocation() {
@@ -149,7 +203,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 mOwnLocation = new LatLng(latitude, longitude);
-                //dropMarker(mOwnLocation, "You are Here!");
             }
         } else {
             askPermission();

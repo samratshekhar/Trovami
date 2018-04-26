@@ -235,6 +235,7 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     public void onActionClicked(String uid) {
         Intent intent = new Intent(getContext(), MapActivity.class);
         intent.putExtra("user", mUserMap.get(uid));
+        intent.putExtra("currentUser", mCurrentUser);
         startActivity(intent);
     }
 }
