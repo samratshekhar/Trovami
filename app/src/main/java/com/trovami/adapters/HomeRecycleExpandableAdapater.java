@@ -56,6 +56,6 @@ public class HomeRecycleExpandableAdapater extends ExpandableRecyclerAdapter<Hom
 
     @Override
     public void onBindChildViewHolder(@NonNull HomeItemViewHolder itemViewHolder, int parentPosition, int childPosition, @NonNull String item) {
-        itemViewHolder.bind(mContext, item, mUserMap);
+        itemViewHolder.bind(mContext, item, mUserMap, parentPosition == 1);
     }
 }

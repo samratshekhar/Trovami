@@ -45,10 +45,11 @@ public class HomeItemViewHolder extends ChildViewHolder {
     public void bind(
             final Context context,
             final String uid,
-            final HashMap<String, User> userMap) {
+            final HashMap<String, User> userMap,
+            final boolean isFollower) {
         User existingUser = userMap.get(uid);
         if (existingUser != null) {
-            bindUserData(context, existingUser);
+            bindUserData(context, existingUser, isFollower);
         } else {
             clearUserData();
             ValueEventListener listener = new ValueEventListener() {
@@ -59,7 +60,7 @@ public class HomeItemViewHolder extends ChildViewHolder {
                         DataSnapshot singleSnapshot = iterator.next();
                         User user = singleSnapshot.getValue(User.class);
                         userMap.put(user.uid, user);
-                        bindUserData(context, user);
+                        bindUserData(context, user, isFollower);
                     }
                 }
                 @Override
@@ -86,7 +87,7 @@ public class HomeItemViewHolder extends ChildViewHolder {
         });
     }
 
-    private void bindUserData(Context context, User user) {
+    private void bindUserData(Context context, User user, Boolean isFollower) {
         txtItemTitle.setText(user.name);
         if (user.latLong != null && user.latLong.timeStamp != null) {
             txtItemSubtitle.setText("Last seen: " + Utils.formatDateTime(user.latLong.timeStamp));
@@ -97,6 +98,11 @@ public class HomeItemViewHolder extends ChildViewHolder {
                 .asBitmap()
                 .load(user.photoUrl)
                 .into(cimgPhoto);
+        if (isFollower) {
+            btnTrack.setVisibility(View.GONE);
+        } else {
+            btnTrack.setVisibility(View.VISIBLE);
+        }
     }
 
     private void clearUserData() {

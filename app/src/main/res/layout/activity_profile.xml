@@ -25,7 +25,9 @@
             android:minHeight="130dp"
             android:minWidth="130dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_profile_placeholder" />
+            android:src="@drawable/ic_profile_placeholder"
+            app:civ_border_color="@android:color/white"
+            app:civ_border_width="1dp"/>
         <Button
             android:id="@+id/update_pic_button"
             android:layout_width="wrap_content"

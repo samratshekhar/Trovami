@@ -106,13 +106,15 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     }
 
     private void showEmptyText(int parentPosition) {
-        if (parentPosition == 0) {
-            if (mCurrentUser.following == null || mCurrentUser.following.keySet().isEmpty()) {
-                Toast.makeText(getContext(), "You're not following anybody!", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            if (mCurrentUser.follower == null || mCurrentUser.follower.keySet().isEmpty()) {
-                Toast.makeText(getContext(), "You're not being followed yet!", Toast.LENGTH_SHORT).show();
+        if (mCurrentUser != null) {
+            if (parentPosition == 0) {
+                if (mCurrentUser.following == null || mCurrentUser.following.keySet().isEmpty()) {
+                    Toast.makeText(getContext(), "You're not following anybody!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                if (mCurrentUser.follower == null || mCurrentUser.follower.keySet().isEmpty()) {
+                    Toast.makeText(getContext(), "You're not being followed yet!", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
