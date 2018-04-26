@@ -29,7 +29,6 @@ public class MessageReceiver extends FirebaseMessagingService {
 
         final String title = remoteMessage.getData().get("title");
         final String message = remoteMessage.getData().get("body");
-
         showNotifications(title, message);
     }
 
@@ -43,7 +42,7 @@ public class MessageReceiver extends FirebaseMessagingService {
                 .setContentText(msg)
                 .setContentTitle(title)
                 .setContentIntent(pendingIntent)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
 
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

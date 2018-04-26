@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -72,6 +74,13 @@ public class DashboardActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
     }
 
+    private void setupFcmToken() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token =  preferences.getString("fcmToken", null);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        User.setFcmToken(token, currentUser.getUid());
+    }
+
     private void setupUI() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard);
         setSupportActionBar(mBinding.toolbar);
@@ -118,6 +127,7 @@ public class DashboardActivity extends AppCompatActivity
                         DataSnapshot singleSnapshot = iterator.next();
                         mCurrentUser = singleSnapshot.getValue(User.class);
                         updateUI(mCurrentUser);
+                        setupFcmToken();
                     } else {
                         createFirebaseUser();
                     }
@@ -132,12 +142,15 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void createFirebaseUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token =  preferences.getString("fcmToken", null);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
         user.name = currentUser.getDisplayName();
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
+        user.fcmToken = token;
         User.setUserById(user, currentUser.getUid());
         updateUI(user);
     }
@@ -198,6 +211,7 @@ public class DashboardActivity extends AppCompatActivity
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                User.clearFcmToken(mAuth.getCurrentUser().getUid());
                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                 mAuth.signOut();
                 Intent logoutIntent = new Intent(activity, MainActivity.class);

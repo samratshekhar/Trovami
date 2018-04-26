@@ -3,8 +3,10 @@ package com.trovami.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -190,12 +192,15 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     }
 
     private void createFirebaseUser() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String token =  preferences.getString("fcmToken", null);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
         user.name = currentUser.getDisplayName();
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
+        user.fcmToken = token;
         User.setUserById(user, currentUser.getUid());
         if (mSwipeRefreshLayout.isRefreshing()){
             Toast.makeText(getContext(), "Refreshed trackers!", Toast.LENGTH_SHORT).show();
