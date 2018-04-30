@@ -47,17 +47,20 @@ public class LocationFetchService extends Service {
         {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
-
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            String timeStamp = DateFormat.format("yyyy-MM-dd hh:mm:ss", new Date().getTime()).toString();
-
-            LatLong loc = new LatLong();
-            loc.lat = location.getLatitude();
-            loc.lon = location.getLongitude();
-            loc.timeStamp = timeStamp;
-
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid()).child("latLong");
-            ref.setValue(loc);
+            if (currentUser != null) {
+                String timeStamp = DateFormat.format("yyyy-MM-dd hh:mm:ss", new Date().getTime()).toString();
+                LatLong loc = new LatLong();
+                loc.lat = location.getLatitude();
+                loc.lon = location.getLongitude();
+                loc.timeStamp = timeStamp;
+                DatabaseReference ref = FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("users")
+                        .child(currentUser.getUid())
+                        .child("latLong");
+                ref.setValue(loc);
+            }
         }
 
         @Override
