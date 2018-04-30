@@ -39,7 +39,7 @@ public class Utils {
 
     public static void safeToast(Context context, String toastMsg) {
         if (context != null) {
-            Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT);
+            Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT).show();
         }
     }
 

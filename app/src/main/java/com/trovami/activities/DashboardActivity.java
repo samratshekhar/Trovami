@@ -67,6 +67,15 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(mHomeFragment == null) {
+            mHomeFragment = HomeFragment.newInstance();
+        }
+        setFragment(mHomeFragment);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }
@@ -97,10 +106,6 @@ public class DashboardActivity extends AppCompatActivity
         toggle.syncState();
 
         mBinding.navView.setNavigationItemSelectedListener(this);
-        if(mHomeFragment == null) {
-            mHomeFragment = HomeFragment.newInstance();
-        }
-        setFragment(mHomeFragment);
     }
 
     private void setupLocationService() {
@@ -259,8 +264,6 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void setFragment(Fragment fragment) {
-
-
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit();
