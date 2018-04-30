@@ -1,5 +1,6 @@
 package com.trovami.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
@@ -57,6 +58,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ActivityMapBinding mBinding;
     private MapView mMapView;
     private GoogleMap map;
+    private ProgressDialog mDialog;
+
     private LatLng mOwnLocation;
     private MapFragmentListener mListener;
     private User mUser;
@@ -113,6 +116,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMapView = mBinding.mapView;
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Logging in...");
+        mDialog.setCancelable(false);
     }
 
     private void setupData() {
@@ -120,7 +126,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mUser = intent.getParcelableExtra("user");
         mCurrentUSer = intent.getParcelableExtra("currentUser");
         mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
-        mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
+        if (mUser.latLong != null && mUser.latLong.timeStamp != null) {
+            mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
+        }
         mBinding.mapTextContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,6 +148,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void startTrackingUsers() {
+        if (mUser == null && mCurrentUSer == null) {
+            Utils.safeToast(getBaseContext(), "No data to track!");
+            return;
+        }
+        mDialog.show();
         if (mUser != null) {
             setupUserLocationListener();
         }
@@ -154,6 +167,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 LatLong latLong = dataSnapshot.getValue(LatLong.class);
+                mDialog.dismiss();
+                if (latLong == null) {
+                    Utils.safeToast(getBaseContext(), mUser.name + "'s location data is unavailable!" );
+                    return;
+                }
                 mUser.latLong = latLong;
                 clearMap();
                 dropMarker(mUser);
@@ -174,6 +192,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 LatLong latLong = dataSnapshot.getValue(LatLong.class);
+                mDialog.dismiss();
+                if (latLong == null) {
+                    Utils.safeToast(getBaseContext(), "Your location data is unavailable!" );
+                    return;
+                }
                 mCurrentUSer.latLong = latLong;
                 clearMap();
                 dropMarker(mUser);
@@ -212,8 +235,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void zoomMap() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(new LatLng(mUser.latLong.lat, mUser.latLong.lon));
-        builder.include(new LatLng(mCurrentUSer.latLong.lat, mCurrentUSer.latLong.lon));
+        if (mUser.latLong != null) {
+            builder.include(new LatLng(mUser.latLong.lat, mUser.latLong.lon));
+        }
+        if (mCurrentUSer.latLong != null){
+            builder.include(new LatLng(mCurrentUSer.latLong.lat, mCurrentUSer.latLong.lon));
+        }
         LatLngBounds bounds = builder.build();
         int padding = 150; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
