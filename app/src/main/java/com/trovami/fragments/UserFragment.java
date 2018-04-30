@@ -9,6 +9,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -181,6 +183,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         View v = inflater.inflate(R.layout.fragment_user, container, false);
         setupListView(v);
         setupSwipeRefresh(v);
+        setupSearchView(v);
         return v;
     }
 
@@ -212,8 +215,37 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         });
     }
 
+    private void setupSearchView(View v) {
+        SearchView searchView = v.findViewById(R.id.search_view);
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filter(query);
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return false;
+            }
+        });
+    }
+
     private void setupFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    void filter(String text){
+        if (text != null) {
+            List<User> temp = new ArrayList();
+            for(User d: mUnfolllowedUsers){
+                if(d.name.toLowerCase().contains(text.toLowerCase())){
+                    temp.add(d);
+                }
+            }
+            mAdapter.updateList(temp);
+        }
     }
 
     @Override

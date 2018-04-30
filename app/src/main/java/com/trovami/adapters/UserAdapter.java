@@ -93,6 +93,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
     }
 
+    public void updateList(List<User> list){
+        mUnfolllowedUsers = list;
+        notifyDataSetChanged();
+    }
+
     public interface UserActionListener {
         void onActionClicked(User user);
     }
