@@ -66,8 +66,8 @@ public class DashboardActivity extends AppCompatActivity
         this.setupUI();
         setupLocationService();
         setupFirebaseAuth();
-        fetchCurrentUser();
         setupFcmToken();
+        fetchCurrentUser(getIntent().getStringExtra("uid"));
     }
 
     @Override
@@ -77,6 +77,39 @@ public class DashboardActivity extends AppCompatActivity
             mHomeFragment = HomeFragment.newInstance();
         }
         setFragment(mHomeFragment);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        fetchCurrentUser(intent.getStringExtra("uid"));
+    }
+
+    private void handleSosNotification(String sosUid) {
+        if (sosUid != null) {
+            ValueEventListener listener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                    if(iterator.hasNext()) {
+                        // user found, fetch followers and following
+                        DataSnapshot singleSnapshot = iterator.next();
+                        User user = singleSnapshot.getValue(User.class);
+                        Intent mapIntent = new Intent(DashboardActivity.this, MapActivity.class);
+                        mapIntent.putExtra("user", user);
+                        mapIntent.putExtra("currentUser", mCurrentUser);
+                        startActivity(mapIntent);
+                    } else {
+                        Utils.safeToast(DashboardActivity.this, "Unable to fetch user!");
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Utils.safeToast(DashboardActivity.this, "Unable to fetch user!");
+                }
+            };
+            User.getUserById(sosUid, listener);
+        }
     }
 
     @Override
@@ -138,9 +171,10 @@ public class DashboardActivity extends AppCompatActivity
         }
     }
 
-    private void fetchCurrentUser() {
+    private void fetchCurrentUser(final String sosUid) {
         if (mCurrentUser != null) {
             updateUI(mCurrentUser);
+            handleSosNotification(sosUid);
         } else {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             ValueEventListener listener = new ValueEventListener() {
@@ -152,6 +186,7 @@ public class DashboardActivity extends AppCompatActivity
                         DataSnapshot singleSnapshot = iterator.next();
                         mCurrentUser = singleSnapshot.getValue(User.class);
                         updateUI(mCurrentUser);
+                        handleSosNotification(sosUid);
                     } else {
                         createFirebaseUser();
                     }

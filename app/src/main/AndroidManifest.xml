@@ -67,7 +67,8 @@
         <activity
             android:name=".activities.DashboardActivity"
             android:label="@string/title_activity_dashboard"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleInstance">
 
         </activity>
 
