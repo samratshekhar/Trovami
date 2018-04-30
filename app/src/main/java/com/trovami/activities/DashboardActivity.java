@@ -74,12 +74,12 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         if(mHomeFragment == null) {
             mHomeFragment = HomeFragment.newInstance();
         }
-        setFragment(mHomeFragment);
+        setFragment(mHomeFragment, "Home");
     }
 
     @Override
@@ -115,11 +115,6 @@ public class DashboardActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     private void setupFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
     }
@@ -134,7 +129,6 @@ public class DashboardActivity extends AppCompatActivity
     private void setupUI() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard);
         setSupportActionBar(mBinding.toolbar);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this,
                 mBinding.drawerLayout,
@@ -304,6 +298,7 @@ public class DashboardActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         Fragment fragment = null;
+        String title = "";
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
@@ -311,30 +306,34 @@ public class DashboardActivity extends AppCompatActivity
                 mHomeFragment = HomeFragment.newInstance();
             }
             fragment = mHomeFragment;
+            title = "Home";
         } else if (id == R.id.nav_notifications) {
             if(mNotificationFragment == null) {
                 mNotificationFragment = NotificationFragment.newInstance();
             }
             fragment = mNotificationFragment;
+            title = "Requests";
         } else if (id == R.id.nav_add_user) {
             if (mUserFragment == null) {
                 mUserFragment = UserFragment.newInstance();
             }
             fragment = mUserFragment;
+            title = "Add User";
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_logout) {
             logout();
         }
-        setFragment(fragment);
+        setFragment(fragment, title);
         mBinding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void setFragment(Fragment fragment) {
+    private void setFragment(Fragment fragment, String title) {
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit();
+            mBinding.toolbar.setTitle(title);
         } catch (Exception e) {
             e.printStackTrace();
         }

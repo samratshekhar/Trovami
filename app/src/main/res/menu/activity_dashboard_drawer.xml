@@ -11,7 +11,7 @@
             android:checked="true"/>
         <item
             android:id="@+id/nav_notifications"
-            android:title="Notifications"
+            android:title="Track Requests"
             android:icon="@drawable/ic_notifications" />
         <item
             android:id="@+id/nav_add_user"

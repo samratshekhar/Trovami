@@ -46,7 +46,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MapActivity"></activity>
+        <activity android:name=".activities.MapActivity"
+            android:label="Tracking"/>
         <activity android:name=".activities.ProfileActivity"/>
         <activity
             android:name="com.facebook.FacebookActivity"

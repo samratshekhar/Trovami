@@ -7,7 +7,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.trovami.activities.MapActivity">
-
         <com.google.android.gms.maps.MapView
             android:id="@+id/mapView"
             class="com.google.android.gms.maps.SupportMapFragment"
