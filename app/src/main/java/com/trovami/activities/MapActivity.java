@@ -62,6 +62,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private User mUser;
     private User mCurrentUSer;
 
+    private ValueEventListener mUserListener;
+    private ValueEventListener mCurrentUserListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +82,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
+        if (mUserListener != null) {
+            FirebaseDatabase.getInstance()
+                    .getReference().child("users").child(mUser.uid).child("latLong")
+                    .removeEventListener(mUserListener);
+        }
+        if (mCurrentUserListener != null) {
+            FirebaseDatabase.getInstance()
+                    .getReference().child("users").child(mCurrentUSer.uid).child("latLong")
+                    .removeEventListener(mCurrentUserListener);
+        }
     }
 
     @Override
@@ -91,7 +104,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         setupMap(googleMap);
 //        getOwnLocation();
-        startTrackingUser();
+        startTrackingUsers();
     }
 
     private void setupUI(Bundle savedInstanceState) {
@@ -126,26 +139,53 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         map.setOnMarkerClickListener(this);
     }
 
-    private void startTrackingUser() {
+    private void startTrackingUsers() {
         if (mUser != null) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mUser.uid).child("latLong");
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    LatLong latLong = dataSnapshot.getValue(LatLong.class);
-                    mUser.latLong = latLong;
-                    clearMap();
-                    dropMarker(mUser);
-                    dropMarker(mCurrentUSer);
-                    zoomMap();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            setupUserLocationListener();
         }
+        if (mCurrentUSer != null) {
+            setupCurrentUserLocationListener();
+        }
+    }
+
+    private void setupUserLocationListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mUser.uid).child("latLong");
+        mUserListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                LatLong latLong = dataSnapshot.getValue(LatLong.class);
+                mUser.latLong = latLong;
+                clearMap();
+                dropMarker(mUser);
+                dropMarker(mCurrentUSer);
+                zoomMap();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setupCurrentUserLocationListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUSer.uid).child("latLong");
+        mCurrentUserListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                LatLong latLong = dataSnapshot.getValue(LatLong.class);
+                mCurrentUSer.latLong = latLong;
+                clearMap();
+                dropMarker(mUser);
+                dropMarker(mCurrentUSer);
+                zoomMap();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void clearMap() {
