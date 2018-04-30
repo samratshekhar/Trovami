@@ -2,6 +2,7 @@ package com.trovami.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,17 +39,20 @@ import com.trovami.fragments.NotificationFragment;
 import com.trovami.fragments.UserFragment;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
+import com.trovami.utils.SosAsyncTask;
 import com.trovami.utils.Utils;
 
 import java.util.Iterator;
 
 public class DashboardActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SosAsyncTask.SosAsyncListener{
 
     private static final String TAG = "DashboardActivity";
     private ActivityDashboardBinding mBinding;
     private FirebaseAuth mAuth;
     private User mCurrentUser;
+    private ProgressDialog mDialog;
 
     private HomeFragment mHomeFragment;
     private NotificationFragment mNotificationFragment;
@@ -106,6 +110,15 @@ public class DashboardActivity extends AppCompatActivity
         toggle.syncState();
 
         mBinding.navView.setNavigationItemSelectedListener(this);
+        mBinding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSosCall();
+            }
+        });
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Sending out Sos call...");
+        mDialog.setCancelable(false);
     }
 
     private void setupLocationService() {
@@ -269,6 +282,32 @@ public class DashboardActivity extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void startSosCall() {
+        final Activity activity = this;
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Send out SoS call?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mDialog.show();
+                SosAsyncTask sos = new SosAsyncTask(DashboardActivity.this);
+                sos.execute(mAuth.getCurrentUser().getUid());
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", null);
+        alertDialogBuilder.create().show();
+    }
+
+    @Override
+    public void onSosComplete(boolean isSuccessful) {
+        mDialog.dismiss();
+        if (isSuccessful) {
+            Utils.safeToast(getBaseContext(), "SoS call sent successfully!");
+        } else {
+            Utils.safeToast(getBaseContext(), "Error sending SoS call!");
         }
     }
 }
