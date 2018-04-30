@@ -1,8 +1,11 @@
 package com.trovami.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import java.text.ParseException;
@@ -43,4 +46,8 @@ public class Utils {
         }
     }
 
+    public static boolean checkIfLocationPermissionGranted(Context context) {
+        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
 }

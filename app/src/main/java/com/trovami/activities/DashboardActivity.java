@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,6 +44,8 @@ import com.trovami.utils.SosAsyncTask;
 import com.trovami.utils.Utils;
 
 import java.util.Iterator;
+
+import okhttp3.internal.Util;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -155,12 +158,29 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void setupLocationService() {
-        // TODO: handle permission
-        ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION }, 1);
-        if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
-            Intent intent = new Intent(this, LocationFetchService.class);
-            startService(intent);
+        if (!Utils.checkIfLocationPermissionGranted(this)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION }, 101);
+        } else {
+            if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
+                Intent intent = new Intent(this, LocationFetchService.class);
+                startService(intent);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setupLocationService();
+                } else {
+                    Utils.safeToast(getBaseContext(), "Location permission needed! Please restart app.");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
