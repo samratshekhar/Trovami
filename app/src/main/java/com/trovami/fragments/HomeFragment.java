@@ -102,7 +102,6 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                 showEmptyText(parentPosition);
             }
         });
-
         mRecyclerView= v.findViewById(R.id.recyclerView_home);
         mRecyclerView.setAdapter(mHomeRecycleExpandableAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -162,6 +161,7 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                     if (mCurrentUser.following != null) {
                         mGrouplist.get(0).setGroupName("You're following (" + mCurrentUser.following.keySet().size() + ")");
                         mGrouplist.get(0).getChildList().addAll(mCurrentUser.following.keySet());
+                        mHomeRecycleExpandableAdapter.expandParent(0);
                     } else {
                         mGrouplist.get(0).setGroupName("You're following (0)");
                     }
