@@ -16,6 +16,7 @@ import com.trovami.R;
 import com.trovami.databinding.ActivityProfileBinding;
 import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
+import com.trovami.utils.Utils;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -65,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     void onUpdatePicClicked(View v) {
-        Toast.makeText(getApplicationContext(), "Pic edit", Toast.LENGTH_LONG).show();
+        Utils.safeToast(getBaseContext(), "Pic edit");
     }
 
     void onUpdateFormClicked(View v) {
@@ -108,7 +109,7 @@ public class ProfileActivity extends AppCompatActivity {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userRef = database.child(RDBSchema.Users.TABLE_NAME).child(mUser.uid);
         userRef.setValue(mUser);
-        Toast.makeText(getApplicationContext(), "Form edit", Toast.LENGTH_LONG).show();
+        Utils.safeToast(getBaseContext(), "Updating data...");
     }
 
     private String validateName(String name) {

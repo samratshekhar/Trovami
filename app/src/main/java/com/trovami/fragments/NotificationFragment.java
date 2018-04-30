@@ -30,6 +30,7 @@ import com.trovami.adapters.UserAdapter;
 import com.trovami.models.Notification;
 import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
+import com.trovami.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -223,7 +224,7 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
 
     private void dismissRefresh(String msg) {
         if (mSwipeRefreshLayout.isRefreshing()){
-            Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+            Utils.safeToast(getContext(), msg);
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }

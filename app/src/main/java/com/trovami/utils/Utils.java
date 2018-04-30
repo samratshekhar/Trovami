@@ -3,6 +3,7 @@ package com.trovami.utils;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,6 +35,12 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void safeToast(Context context, String toastMsg) {
+        if (context != null) {
+            Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT);
+        }
     }
 
 }

@@ -30,6 +30,7 @@ import com.trovami.adapters.HomeItemViewHolder;
 import com.trovami.adapters.HomeRecycleExpandableAdapater;
 import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
+import com.trovami.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,11 +112,11 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
         if (mCurrentUser != null) {
             if (parentPosition == 0) {
                 if (mCurrentUser.following == null || mCurrentUser.following.keySet().isEmpty()) {
-                    Toast.makeText(getContext(), "You're not following anybody!", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "You're not following anybody!");
                 }
             } else {
                 if (mCurrentUser.follower == null || mCurrentUser.follower.keySet().isEmpty()) {
-                    Toast.makeText(getContext(), "You're not being followed yet!", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "You're not being followed yet!");
                 }
             }
         }
@@ -176,14 +177,14 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                     createFirebaseUser();
                 }
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getContext(), "Refreshed trackers!", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Refreshed trackers!");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getContext(), "Could not refresh data", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Could not refresh data.");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -203,7 +204,7 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
         user.fcmToken = token;
         User.setUserById(user, currentUser.getUid());
         if (mSwipeRefreshLayout.isRefreshing()){
-            Toast.makeText(getContext(), "Refreshed trackers!", Toast.LENGTH_SHORT).show();
+            Utils.safeToast(getContext(), "Refreshed trackers!");
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }

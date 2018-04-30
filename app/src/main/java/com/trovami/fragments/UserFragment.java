@@ -29,6 +29,7 @@ import com.trovami.adapters.UserAdapter;
 import com.trovami.models.Notification;
 import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
+import com.trovami.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -78,7 +79,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Could not refresh data.");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
@@ -100,7 +101,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
                     fetchUnfollowedUsers();
                 } else {
                     if (mSwipeRefreshLayout.isRefreshing()){
-                        Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                        Utils.safeToast(getContext(), "Could not refresh data.");
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -108,7 +109,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Could not refresh data.");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
@@ -135,14 +136,14 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
                 }
                 mAdapter.notifyDataSetChanged();
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getActivity(), "Refreshed user list!", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Refreshed user list!");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 if (mSwipeRefreshLayout.isRefreshing()){
-                    Toast.makeText(getActivity(), "Could not refresh data.", Toast.LENGTH_SHORT).show();
+                    Utils.safeToast(getContext(), "Could not refresh data.");
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -172,7 +173,6 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
         DatabaseReference receiverRef = database.child(RDBSchema.Notification.TABLE_NAME).child(user.uid).child("from");
         receiverRef.child(mCurrentUser.uid).setValue(mCurrentUser.uid);
 
-        //Toast.makeText(getActivity(), "Request sent.",Toast.LENGTH_SHORT).show();
         startRefresh();
 
     }

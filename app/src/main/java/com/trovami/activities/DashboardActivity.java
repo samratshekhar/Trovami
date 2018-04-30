@@ -195,7 +195,7 @@ public class DashboardActivity extends AppCompatActivity
                 return;
             }
             this.mDoubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+            Utils.safeToast(getBaseContext(), "Please click BACK again to exit");
 
             new Handler().postDelayed(new Runnable() {
 

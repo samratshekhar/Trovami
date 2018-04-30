@@ -33,6 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.trovami.R;
 import com.trovami.databinding.ActivityMainBinding;
+import com.trovami.utils.Utils;
 
 import java.util.Arrays;
 
@@ -126,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.sign_in_email:
                 this.startMapFragment();
-                Toast.makeText(getApplicationContext(),"Logging in with Email", Toast.LENGTH_SHORT).show();
                 // TODO: handle email login
                 break;
         }
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(mainActivity, task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        Utils.safeToast(getBaseContext(), task.getException().getLocalizedMessage());
                     }
                 }
             }
@@ -202,9 +202,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
                         if(task.getException().getClass().equals(FirebaseAuthUserCollisionException.class)){
-                            Toast.makeText(mainActivity, "Already logged in with Google. Please login with google (without logging out of FB)to link accounts.", Toast.LENGTH_LONG).show();
+                            Utils.safeToast(getBaseContext(), "Already logged in with Google. Please login with google (without logging out of FB)to link accounts.");
                         } else {
-                            Toast.makeText(mainActivity, task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                            Utils.safeToast(getBaseContext(), task.getException().getLocalizedMessage());
                             fbCredential = null;
                         }
                     }
