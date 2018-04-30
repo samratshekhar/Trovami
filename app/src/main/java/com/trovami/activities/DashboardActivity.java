@@ -104,13 +104,19 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void setupLocationService() {
+        // TODO: handle permission
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION }, 1);
         if (!Utils.isServiceRunning(this, LocationFetchService.class)) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION }, 1);
             Intent intent = new Intent(this, LocationFetchService.class);
             startService(intent);
-        } else {
-            Log.d(TAG, "Service up");
+        }
+    }
+
+    private void teardownLocationService() {
+        if (Utils.isServiceRunning(this, LocationFetchService.class)) {
+            Intent intent = new Intent(this, LocationFetchService.class);
+            stopService(intent);
         }
     }
 
@@ -209,6 +215,7 @@ public class DashboardActivity extends AppCompatActivity
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 User.clearFcmToken(mAuth.getCurrentUser().getUid());
+                teardownLocationService();
                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                 mAuth.signOut();
                 Intent logoutIntent = new Intent(activity, MainActivity.class);
