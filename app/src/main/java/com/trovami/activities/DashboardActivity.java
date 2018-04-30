@@ -63,6 +63,7 @@ public class DashboardActivity extends AppCompatActivity
         setupLocationService();
         setupFirebaseAuth();
         fetchCurrentUser();
+        setupFcmToken();
     }
 
     @Override
@@ -127,7 +128,6 @@ public class DashboardActivity extends AppCompatActivity
                         DataSnapshot singleSnapshot = iterator.next();
                         mCurrentUser = singleSnapshot.getValue(User.class);
                         updateUI(mCurrentUser);
-                        setupFcmToken();
                     } else {
                         createFirebaseUser();
                     }
@@ -142,15 +142,12 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void createFirebaseUser() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token =  preferences.getString("fcmToken", null);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
         user.name = currentUser.getDisplayName();
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
-        user.fcmToken = token;
         User.setUserById(user, currentUser.getUid());
         updateUI(user);
     }

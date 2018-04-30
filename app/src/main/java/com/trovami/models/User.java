@@ -57,14 +57,14 @@ public class User implements Parcelable {
 
     public static void setFcmToken(String token, String uid) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = database.child("users").child(uid).child("fcmToken");
+        DatabaseReference ref = database.child("fcmTokens").child(uid);
         ref.setValue(token);
         return;
     }
 
     public static void clearFcmToken(String uid) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = database.child("users").child(uid).child("fcmToken");
+        DatabaseReference ref = database.child("fcmTokens").child(uid);
         ref.removeValue();
         return;
     }
