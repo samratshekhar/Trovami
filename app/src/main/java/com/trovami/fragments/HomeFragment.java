@@ -193,15 +193,12 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     }
 
     private void createFirebaseUser() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String token =  preferences.getString("fcmToken", null);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
         user.name = currentUser.getDisplayName();
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
-        user.fcmToken = token;
         User.setUserById(user, currentUser.getUid());
         if (mSwipeRefreshLayout.isRefreshing()){
             Utils.safeToast(getContext(), "Refreshed trackers!");

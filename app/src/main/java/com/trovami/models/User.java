@@ -24,7 +24,6 @@ public class User implements Parcelable {
     public String phone;
     public String gender;
     public String photoUrl;
-    public String fcmToken;
     public LatLong latLong;
     public HashMap<String, String> follower;
     public HashMap<String, String> following;
@@ -76,7 +75,6 @@ public class User implements Parcelable {
         phone = in.readString();
         gender = in.readString();
         photoUrl = in.readString();
-        fcmToken = in.readString();
         latLong = (LatLong) in.readValue(LatLong.class.getClassLoader());
         follower = (HashMap) in.readValue(HashMap.class.getClassLoader());
         following = (HashMap) in.readValue(HashMap.class.getClassLoader());
@@ -95,7 +93,6 @@ public class User implements Parcelable {
         dest.writeString(phone);
         dest.writeString(gender);
         dest.writeString(photoUrl);
-        dest.writeString(fcmToken);
         dest.writeValue(latLong);
         dest.writeValue(follower);
         dest.writeValue(following);
