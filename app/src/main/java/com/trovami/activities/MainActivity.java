@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(mBinding.toolbar);
         mBinding.signInGoogle.setOnClickListener(this);
-        mBinding.signInFacebook.setOnClickListener(this);
-        mBinding.signInEmail.setOnClickListener(this);
+        //mBinding.signInFacebook.setOnClickListener(this);
+        //mBinding.signInEmail.setOnClickListener(this);
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Logging in...");
         mDialog.setCancelable(false);
@@ -122,13 +122,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.sign_in_google:
                 this.signinGoogle();
                 break;
-            case R.id.sign_in_facebook:
+            /*case R.id.sign_in_facebook:
                 // TODO: handle fb login
                 break;
             case R.id.sign_in_email:
                 this.startMapFragment();
                 // TODO: handle email login
-                break;
+                break;8*/
         }
     }
 

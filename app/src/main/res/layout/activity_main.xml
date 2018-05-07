@@ -33,68 +33,44 @@
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_google"
                 style="@style/AppTheme.NoActionBar"
-                android:layout_width="400px"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="95dp"
+                android:paddingLeft="7dp"
+                android:paddingRight="7dp"
                 android:onClick="onClickGoogleSignin"
                 app:buttonSize="wide"
                 app:colorScheme="dark" />
 
-            <Button
-                android:id="@+id/sign_in_facebook"
-
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="400px"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/sign_in_google"
-                android:layout_alignStart="@+id/sign_in_google"
-                android:layout_below="@+id/sign_in_google"
-                android:layout_marginTop="36dp"
-                android:background="@color/colorPrimaryDark"
-                android:elevation="0dp"
-                android:text=" Sign in with Facebook "
-                android:textAlignment="center"
-                android:typeface="normal" />
-
-
-
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/login_button"
+                android:layout_below="@+id/sign_in_google"
+                android:layout_centerHorizontal="true"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp" />
+                android:layout_marginTop="36dp" />
 
             <Button
                 android:id="@+id/sign_in_email"
-
                 style="@style/Widget.AppCompat.Button"
-                android:layout_width="400px"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="27dp"
+                android:paddingRight="27dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/sign_in_facebook"
-                android:layout_alignStart="@+id/sign_in_facebook"
-                android:layout_below="@+id/sign_in_facebook"
+                android:layout_below="@+id/login_button"
                 android:layout_marginTop="36dp"
                 android:elevation="24dp"
                 android:text="SIGN IN WITH EMAIL"
                 android:textAlignment="center"
                 android:typeface="normal" />
 
-
-
-
         </RelativeLayout>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_dialog_email" />
 
     </android.support.design.widget.CoordinatorLayout>
 
