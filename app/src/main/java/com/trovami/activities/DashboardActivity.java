@@ -100,11 +100,13 @@ public class DashboardActivity extends AppCompatActivity
                         // user found, fetch followers and following
                         DataSnapshot singleSnapshot = iterator.next();
                         User user = singleSnapshot.getValue(User.class);
-                        Intent mapIntent = new Intent(DashboardActivity.this, MapActivity.class);
-                        mapIntent.putExtra("user", user);
-                        ApplicationState state = (ApplicationState)getApplicationContext();
-                        mapIntent.putExtra("currentUser", state.getCurrentUser());
-                        startActivity(mapIntent);
+                        if (user != null) {
+                            ApplicationState state = (ApplicationState)getApplicationContext();
+                            Intent mapIntent = new Intent(DashboardActivity.this, MapActivity.class);
+                            mapIntent.putExtra("user", user);
+                            mapIntent.putExtra("currentUser", state.getCurrentUser());
+                            startActivity(mapIntent);
+                        }
                     } else {
                         Utils.safeToast(DashboardActivity.this, "Unable to fetch user!");
                     }

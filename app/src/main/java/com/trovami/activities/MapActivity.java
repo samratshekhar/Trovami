@@ -126,16 +126,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Intent intent = getIntent();
         mUser = intent.getParcelableExtra("user");
         mCurrentUSer = intent.getParcelableExtra("currentUser");
-        mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
-        if (mUser.latLong != null && mUser.latLong.timeStamp != null) {
-            mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
-        }
+        updateTitleView();
         mBinding.mapTextContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 zoomMap();
             }
         });
+    }
+
+    private void updateTitleView() {
+        if (mUser != null) {
+            mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
+            if (mUser.latLong != null && mUser.latLong.timeStamp != null) {
+                mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
+            }
+        } else {
+            mBinding.mapTitleTextView.setText("Tracker info unavailable");
+        }
+
     }
 
     private void setupMap(GoogleMap googleMap) {
@@ -178,6 +187,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 dropMarker(mUser);
                 dropMarker(mCurrentUSer);
                 zoomMap();
+                updateTitleView();
             }
 
             @Override
