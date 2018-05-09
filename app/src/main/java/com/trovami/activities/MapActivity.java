@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.CameraUpdate;
@@ -125,16 +126,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Intent intent = getIntent();
         mUser = intent.getParcelableExtra("user");
         mCurrentUSer = intent.getParcelableExtra("currentUser");
-        mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
-        if (mUser.latLong != null && mUser.latLong.timeStamp != null) {
-            mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
-        }
+        updateTitleView();
         mBinding.mapTextContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 zoomMap();
             }
         });
+    }
+
+    private void updateTitleView() {
+        if (mUser != null) {
+            mBinding.mapTitleTextView.setText("Tracking " + mUser.name);
+            if (mUser.latLong != null && mUser.latLong.timeStamp != null) {
+                mBinding.mapSubtitleTextView.setText("Last seen @ " + Utils.formatDateTime(mUser.latLong.timeStamp));
+            }
+        } else {
+            mBinding.mapTitleTextView.setText("Tracker info unavailable");
+        }
+
     }
 
     private void setupMap(GoogleMap googleMap) {
@@ -177,6 +187,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 dropMarker(mUser);
                 dropMarker(mCurrentUSer);
                 zoomMap();
+                updateTitleView();
             }
 
             @Override
@@ -220,6 +231,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Glide.with(this)
                     .asBitmap()
                     .load(user.photoUrl)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.ic_profile_placeholder))
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {

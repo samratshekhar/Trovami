@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ChildViewHolder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -96,6 +97,8 @@ public class HomeItemViewHolder extends ChildViewHolder {
         }
         Glide.with(context)
                 .asBitmap()
+                .apply(new RequestOptions()
+                        .placeholder(R.drawable.ic_profile_placeholder))
                 .load(user.photoUrl)
                 .into(cimgPhoto);
         if (isFollower) {

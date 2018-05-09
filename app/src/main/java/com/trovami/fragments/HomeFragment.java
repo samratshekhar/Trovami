@@ -30,6 +30,7 @@ import com.trovami.adapters.HomeItemViewHolder;
 import com.trovami.adapters.HomeRecycleExpandableAdapater;
 import com.trovami.models.HomeGroup;
 import com.trovami.models.User;
+import com.trovami.utils.ApplicationState;
 import com.trovami.utils.Utils;
 
 import java.util.ArrayList;
@@ -156,6 +157,11 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
                     // user found, fetch followers and following
                     DataSnapshot singleSnapshot = iterator.next();
                     mCurrentUser = singleSnapshot.getValue(User.class);
+                    if (getActivity() != null) {
+                        ApplicationState state = (ApplicationState)getActivity().getApplicationContext();
+                        state.setCurrentUser(singleSnapshot.getValue(User.class));
+                    }
+
                     mGrouplist.get(0).getChildList().clear();
                     mGrouplist.get(1).getChildList().clear(); //to avoid duplication when screen refreshed
                     if (mCurrentUser.following != null) {
@@ -239,8 +245,13 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     @Override
     public void onActionClicked(String uid) {
         Intent intent = new Intent(getContext(), MapActivity.class);
-        intent.putExtra("user", mUserMap.get(uid));
-        intent.putExtra("currentUser", mCurrentUser);
-        startActivity(intent);
+        if (mUserMap.get(uid) != null) {
+            intent.putExtra("user", mUserMap.get(uid));
+            intent.putExtra("currentUser", mCurrentUser);
+            startActivity(intent);
+        } else {
+            Utils.safeToast(getContext(), "Unable to fetch user data!");
+        }
+
     }
 }

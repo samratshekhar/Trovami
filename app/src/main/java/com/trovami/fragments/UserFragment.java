@@ -47,6 +47,7 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SwipeRefreshLayout.OnRefreshListener mSwipeListener;
+    private SearchView mSearchView;
 
     public UserFragment() {
         // Required empty public constructor
@@ -134,7 +135,8 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
                         }
                     }
                 }
-                mAdapter.notifyDataSetChanged();
+                mSearchView.setQuery(null, true);
+                mAdapter.updateList(mUnfolllowedUsers);
                 if (mSwipeRefreshLayout.isRefreshing()){
                     Utils.safeToast(getContext(), "Refreshed user list!");
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -216,9 +218,9 @@ public class UserFragment extends Fragment implements UserAdapter.UserActionList
     }
 
     private void setupSearchView(View v) {
-        SearchView searchView = v.findViewById(R.id.search_view);
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = v.findViewById(R.id.search_view);
+        mSearchView.setIconifiedByDefault(false);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 filter(query);

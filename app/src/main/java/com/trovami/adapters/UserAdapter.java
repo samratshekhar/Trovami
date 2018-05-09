@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.trovami.R;
 import com.trovami.models.User;
 
@@ -88,6 +89,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             subtitle.setText(user.email);
             Glide.with(mContext)
                     .load(user.photoUrl)
+                    .apply(new RequestOptions()
+                        .placeholder(R.drawable.ic_profile_placeholder))
                     .into(profilePic);
 
         }
