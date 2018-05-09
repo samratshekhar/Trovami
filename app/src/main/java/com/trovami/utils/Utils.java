@@ -50,4 +50,9 @@ public class Utils {
         int result = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         return result == PackageManager.PERMISSION_GRANTED;
     }
+
+    public static boolean checkIfCallPermissionGranted(Context context) {
+        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
 }

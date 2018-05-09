@@ -1,13 +1,17 @@
 package com.trovami.activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
@@ -68,8 +72,7 @@ public class ProfileActivity extends AppCompatActivity {
                         alertDialogBuilder.setPositiveButton("Call", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mUser.phone));
-                                startActivity(intent);
+                                callUser();
                             }
                         });
                         alertDialogBuilder.setNegativeButton("Cancel", null);
@@ -97,6 +100,18 @@ public class ProfileActivity extends AppCompatActivity {
                         alertDialogBuilder.create().show();
                     }
 
+                }
+            });
+            mBinding.updateFormButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onUpdateFormClicked(v);
+                }
+            });
+            mBinding.updatePicButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onUpdatePicClicked(v);
                 }
             });
         }
@@ -197,5 +212,35 @@ public class ProfileActivity extends AppCompatActivity {
         if (phone == null || phone.isEmpty()) return "Phone required";
         if (!Patterns.PHONE.matcher(phone).matches()) return  "Phone invalid";
         return null;
+    }
+
+    private void callUser() {
+        if (!Utils.checkIfCallPermissionGranted(this)) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.CALL_PHONE }, 202);
+        } else {
+            try {
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mUser.phone));
+                startActivity(intent);
+            } catch (SecurityException e) {
+                Log.d(TAG, e.getMessage());
+                Utils.safeToast(this, "Call permission not provided");
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 202:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    callUser();
+                } else {
+                    Utils.safeToast(getBaseContext(), "Call permission needed! Please retry later.");
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

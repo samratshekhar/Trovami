@@ -239,8 +239,13 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
     @Override
     public void onActionClicked(String uid) {
         Intent intent = new Intent(getContext(), MapActivity.class);
-        intent.putExtra("user", mUserMap.get(uid));
-        intent.putExtra("currentUser", mCurrentUser);
-        startActivity(intent);
+        if (mUserMap.get(uid) != null) {
+            intent.putExtra("user", mUserMap.get(uid));
+            intent.putExtra("currentUser", mCurrentUser);
+            startActivity(intent);
+        } else {
+            Utils.safeToast(getContext(), "Unable to fetch user data!");
+        }
+
     }
 }

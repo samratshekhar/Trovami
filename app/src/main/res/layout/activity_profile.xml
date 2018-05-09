@@ -40,8 +40,7 @@
             android:layout_alignRight="@id/profile_image"
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/ic_edit"
-            android:gravity="center_horizontal|top"
-            android:onClick="onUpdatePicClicked" />
+            android:gravity="center_horizontal|top"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -150,7 +149,6 @@
         android:layout_margin="8dp"
         android:text="Update"
         android:textColor="@android:color/white"
-        android:background="@color/colorAccent"
-        android:onClick="onUpdateFormClicked"/>
+        android:background="@color/colorAccent"/>
 </LinearLayout>
 </layout>
