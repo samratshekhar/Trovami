@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.trovami.R;
 import com.trovami.databinding.ActivityDashboardBinding;
+import com.trovami.fragments.AboutFragment;
 import com.trovami.fragments.HomeFragment;
 import com.trovami.fragments.NotificationFragment;
 import com.trovami.fragments.UserFragment;
@@ -59,6 +60,7 @@ public class DashboardActivity extends AppCompatActivity
 
     private HomeFragment mHomeFragment;
     private NotificationFragment mNotificationFragment;
+    private AboutFragment mAboutFragment;
     private UserFragment mUserFragment;
 
     private boolean mDoubleBackToExitPressedOnce = false;
@@ -320,7 +322,11 @@ public class DashboardActivity extends AppCompatActivity
             fragment = mUserFragment;
             title = "Add User";
         } else if (id == R.id.nav_about) {
-
+            if(mAboutFragment == null){
+                mAboutFragment= AboutFragment.newInstance();
+            }
+            fragment = mAboutFragment;
+            title = "About";
         } else if (id == R.id.nav_logout) {
             logout();
         }

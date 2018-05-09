@@ -1,0 +1,77 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.trovami.fragments.AboutFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:text="TROVAMI" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingBottom="10dp"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:text="Version 1.0" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="15dp"
+            android:text="Trovami is created by Anusha Lihala, Kuntala Sett and Avinash Mishra." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="15dp"
+            android:text="It was created as a college project, under the guidance of Prof. Khalid Ashraf and Prof. Soumya Ray and with immense help from Samrat Shekhar." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="15dp"
+            android:text="Trovami uses the GPS service of your mobile phone to access your location." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="15dp"
+            android:text="The motivation to build this application came from the dynamic, reliable and robust nature of Google Maps, using which we wanted to build something new and exciting!" />
+    </LinearLayout>
+
+
+</FrameLayout>
