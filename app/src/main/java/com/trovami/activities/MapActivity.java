@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.CameraUpdate;
@@ -220,6 +221,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Glide.with(this)
                     .asBitmap()
                     .load(user.photoUrl)
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.ic_profile_placeholder))
                     .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
