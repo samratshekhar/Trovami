@@ -2,6 +2,7 @@ package com.trovami.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import com.trovami.fragments.NotificationFragment;
 import com.trovami.fragments.UserFragment;
 import com.trovami.models.User;
 import com.trovami.services.LocationFetchService;
+import com.trovami.utils.ApplicationState;
 import com.trovami.utils.SosAsyncTask;
 import com.trovami.utils.Utils;
 
@@ -54,7 +56,6 @@ public class DashboardActivity extends AppCompatActivity
     private static final String TAG = "DashboardActivity";
     private ActivityDashboardBinding mBinding;
     private FirebaseAuth mAuth;
-    private User mCurrentUser;
     private ProgressDialog mDialog;
 
     private HomeFragment mHomeFragment;
@@ -100,7 +101,8 @@ public class DashboardActivity extends AppCompatActivity
                         User user = singleSnapshot.getValue(User.class);
                         Intent mapIntent = new Intent(DashboardActivity.this, MapActivity.class);
                         mapIntent.putExtra("user", user);
-                        mapIntent.putExtra("currentUser", mCurrentUser);
+                        ApplicationState state = (ApplicationState)getApplicationContext();
+                        mapIntent.putExtra("currentUser", state.getCurrentUser());
                         startActivity(mapIntent);
                     } else {
                         Utils.safeToast(DashboardActivity.this, "Unable to fetch user!");
@@ -135,7 +137,13 @@ public class DashboardActivity extends AppCompatActivity
                 mBinding.toolbar,
                 R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
-        );
+        ){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                updateUI();
+            }
+        };
         mBinding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -186,35 +194,33 @@ public class DashboardActivity extends AppCompatActivity
     }
 
     private void fetchCurrentUser(final String sosUid) {
-        if (mCurrentUser != null) {
-            updateUI(mCurrentUser);
-            handleSosNotification(sosUid);
-        } else {
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            ValueEventListener listener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                    if(iterator.hasNext()) {
-                        // user found, fetch followers and following
-                        DataSnapshot singleSnapshot = iterator.next();
-                        mCurrentUser = singleSnapshot.getValue(User.class);
-                        updateUI(mCurrentUser);
-                        handleSosNotification(sosUid);
-                    } else {
-                        createFirebaseUser();
-                    }
+        final ApplicationState state = (ApplicationState)getApplicationContext();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if(iterator.hasNext()) {
+                    // user found, fetch followers and following
+                    DataSnapshot singleSnapshot = iterator.next();
+                    User user = singleSnapshot.getValue(User.class);
+                    state.setCurrentUser(user);
+                    updateUI();
+                    handleSosNotification(sosUid);
+                } else {
+                    createFirebaseUser();
                 }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // TODO: handle error
-                }
-            };
-            User.getUserById(currentUser.getUid(), listener);
-        }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // TODO: handle error
+            }
+        };
+        User.getUserById(currentUser.getUid(), listener);
     }
 
     private void createFirebaseUser() {
+        ApplicationState state = (ApplicationState)getApplicationContext();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
@@ -222,32 +228,36 @@ public class DashboardActivity extends AppCompatActivity
         user.photoUrl = currentUser.getPhotoUrl().toString();
         user.uid = currentUser.getUid();
         User.setUserById(user, currentUser.getUid());
-        updateUI(user);
+        state.setCurrentUser(user);
+        updateUI();
     }
 
-    private void updateUI(final User user) {
+    private void updateUI() {
         final Activity activity = this;
-        // TODO: update porfile pic
-        View headerView =  mBinding.navView.getHeaderView(0);
-        ImageView profileImageView = headerView.findViewById(R.id.nav_image_view);
-        TextView nameTextView = headerView.findViewById(R.id.nav_title_text_view);
-        TextView emailTextView = headerView.findViewById(R.id.nav_subtitle_text_view);
+        final ApplicationState state = (ApplicationState)getApplicationContext();
+        User user = state.getCurrentUser();
+        if (user != null) {
+            View headerView =  mBinding.navView.getHeaderView(0);
+            ImageView profileImageView = headerView.findViewById(R.id.nav_image_view);
+            TextView nameTextView = headerView.findViewById(R.id.nav_title_text_view);
+            TextView emailTextView = headerView.findViewById(R.id.nav_subtitle_text_view);
+            nameTextView.setText(user.name);
+            emailTextView.setText(user.email);
+            Glide.with(getBaseContext())
+                    .load(user.photoUrl)
+                    .into(profileImageView);
+            profileImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activity, ProfileActivity.class);
+                    intent.putExtra("user", state.getCurrentUser());
+                    intent.putExtra("isUpdate", true);
+                    startActivity(intent);
+                    mBinding.drawerLayout.closeDrawer(GravityCompat.START);
+                }
+            });
+        }
 
-        nameTextView.setText(user.name);
-        emailTextView.setText(user.email);
-        Glide.with(getBaseContext())
-                .load(user.photoUrl)
-                .into(profileImageView);
-        profileImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, ProfileActivity.class);
-                intent.putExtra("user", user);
-                intent.putExtra("isUpdate", true);
-                startActivity(intent);
-                mBinding.drawerLayout.closeDrawer(GravityCompat.START);
-            }
-        });
 
     }
 

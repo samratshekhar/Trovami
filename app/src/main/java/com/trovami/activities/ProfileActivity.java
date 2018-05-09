@@ -10,13 +10,18 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.trovami.R;
 import com.trovami.databinding.ActivityProfileBinding;
 import com.trovami.models.RDBSchema;
 import com.trovami.models.User;
+import com.trovami.utils.ApplicationState;
 import com.trovami.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -103,12 +108,25 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateUser(String name, String email, String phone) {
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("name", name);
+        updateMap.put("email", email);
+        updateMap.put("phone", phone);
+
         mUser.name = name;
         mUser.email = email;
         mUser.phone = phone;
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userRef = database.child(RDBSchema.Users.TABLE_NAME).child(mUser.uid);
-        userRef.setValue(mUser);
+        userRef.updateChildren(updateMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    ApplicationState state = (ApplicationState)getApplicationContext();
+                    state.setCurrentUser(mUser);
+                }
+            }
+        });
         Utils.safeToast(getBaseContext(), "Updating data...");
     }
 
