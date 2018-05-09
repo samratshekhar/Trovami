@@ -1,8 +1,12 @@
 package com.trovami.activities;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
 import android.view.View;
@@ -54,6 +58,47 @@ public class ProfileActivity extends AppCompatActivity {
                     .apply(new RequestOptions()
                             .placeholder(R.drawable.ic_profile_placeholder))
                     .into(mBinding.profileImage);
+            final Activity activity = this;
+            mBinding.callButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mUser.phone != null && !mUser.phone.isEmpty()){
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+                        alertDialogBuilder.setTitle("Call " + mUser.name + "?");
+                        alertDialogBuilder.setPositiveButton("Call", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mUser.phone));
+                                startActivity(intent);
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("Cancel", null);
+                        alertDialogBuilder.create().show();
+                    }
+
+                }
+            });
+            mBinding.mailButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mUser.email != null && !mUser.email.isEmpty()){
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+                        alertDialogBuilder.setTitle("Mail " + mUser.name + "?");
+                        alertDialogBuilder.setPositiveButton("Mail", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                        "mailto",mUser.email, null));
+                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "via Trovami");
+                                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("Cancel", null);
+                        alertDialogBuilder.create().show();
+                    }
+
+                }
+            });
         }
         if (!mIsUpdate) {
             mBinding.nameEditText.setFocusable(false);
@@ -61,9 +106,13 @@ public class ProfileActivity extends AppCompatActivity {
             mBinding.phoneEditText.setFocusable(false);
             mBinding.updateFormButton.setVisibility(View.GONE);
             mBinding.updatePicButton.setVisibility(View.GONE);
+            mBinding.callButton.setVisibility(View.VISIBLE);
+            mBinding.mailButton.setVisibility(View.VISIBLE);
         } else {
             mBinding.updateFormButton.setVisibility(View.VISIBLE);
             mBinding.updatePicButton.setVisibility(View.VISIBLE);
+            mBinding.callButton.setVisibility(View.GONE);
+            mBinding.mailButton.setVisibility(View.GONE);
         }
     }
 
