@@ -69,9 +69,9 @@ public class EmailSigninActivity extends AppCompatActivity {
         }
 
         if (passwordValidation != null) {
-            mBinding.passwordEditText.setError(passwordValidation);
+            mBinding.passwordEditTextLayout.setError(passwordValidation);
         } else {
-            mBinding.passwordEditText.setError(null);
+            mBinding.passwordEditTextLayout.setError(null);
         }
 
         if (emailValidation == null && passwordValidation == null) {
