@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MainActivity";
     private static final int RC_GOOGLE_SIGN_IN = 999;
+    private static final int RC_EMAIL_SIGN_IN = 666;
     private ActivityMainBinding mBinding;
     private GoogleSignInClient mGoogleSignInClient;
     private CallbackManager mFacebookCallbackManagaer;
@@ -133,12 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startEmailSigninActivity() {
         Intent intent = new Intent(this, EmailSigninActivity.class);
-        startActivity(intent);
-    }
-
-    private void startMapFragment() {
-        Intent intent = new Intent(this, MapActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, RC_EMAIL_SIGN_IN);
     }
 
     private void signinGoogle() {
@@ -151,16 +147,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mFacebookCallbackManagaer.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_GOOGLE_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-                Log.d(TAG, account.getDisplayName());
-            } catch (ApiException e) {
-                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                // TODO: handle error
-            }
+        switch (requestCode) {
+            case RC_GOOGLE_SIGN_IN:
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                try {
+                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                    firebaseAuthWithGoogle(account);
+                    Log.d(TAG, account.getDisplayName());
+                } catch (ApiException e) {
+                    Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                    // TODO: handle error
+                }
+                break;
+            case RC_EMAIL_SIGN_IN:
+                loginUser();
+                break;
+            default:
+                break;
+
         }
     }
 

@@ -203,7 +203,9 @@ public class HomeFragment extends Fragment implements HomeItemViewHolder.HomeIte
         User user = new User();
         user.email = currentUser.getEmail();
         user.name = currentUser.getDisplayName();
-        user.photoUrl = currentUser.getPhotoUrl().toString();
+        if (currentUser.getPhotoUrl() != null) {
+            user.photoUrl = currentUser.getPhotoUrl().toString();
+        }
         user.uid = currentUser.getUid();
         User.setUserById(user, currentUser.getUid());
         if (mSwipeRefreshLayout.isRefreshing()){

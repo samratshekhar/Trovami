@@ -1,17 +1,35 @@
 package com.trovami.activities;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 import com.trovami.R;
 import com.trovami.databinding.ActivityEmailSigninBinding;
+import com.trovami.utils.Utils;
 
 public class EmailSigninActivity extends AppCompatActivity {
 
+    private static final String TAG = "EmailSigninActivity";
+
     private ActivityEmailSigninBinding mBinding;
+
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +46,9 @@ public class EmailSigninActivity extends AppCompatActivity {
                 validateCredentials();
             }
         });
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Logging in...");
+        mDialog.setCancelable(false);
     }
 
     private void validateCredentials() {
@@ -51,7 +72,7 @@ public class EmailSigninActivity extends AppCompatActivity {
 
         if (emailValidation == null && passwordValidation == null) {
             // sign in!
-            signIn(email, password);
+            createUser(email, password);
         }
     }
 
@@ -67,6 +88,65 @@ public class EmailSigninActivity extends AppCompatActivity {
     }
 
     private void signIn(String email, String password) {
+        mDialog.show();
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    mDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Utils.safeToast(getBaseContext(), "Authentication Success");
+                        sendSuccessStatusBack();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Utils.safeToast(getBaseContext(), "Authentication failed");
+                    }
+                }
+            });
 
+    }
+
+    private void createUser(final String email, final String password) {
+        mDialog.show();
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Utils.safeToast(getBaseContext(), "Authentication Success");
+                            mDialog.dismiss();
+                            sendSuccessStatusBack();
+                        } else {
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            try {
+                                throw task.getException();
+                            } catch (FirebaseAuthWeakPasswordException weakPassword) {
+                                Utils.safeToast(getBaseContext(), "Weak password");
+                                mDialog.dismiss();
+                            }catch (FirebaseAuthUserCollisionException existEmail) {
+                                // user exists, try sign in
+                                signIn(email, password);
+                            } catch (Exception e) {
+                                Log.d(TAG, "onComplete: " + e.getMessage());
+                                mDialog.dismiss();
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void sendSuccessStatusBack() {
+        Intent resultIntent = new Intent();
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 }
