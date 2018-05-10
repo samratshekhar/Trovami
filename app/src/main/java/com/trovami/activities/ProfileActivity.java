@@ -2,6 +2,7 @@ package com.trovami.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -169,6 +171,8 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         if (nameValidation == null && emailValidation == null && phoneValidation == null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mBinding.phoneEditText.getWindowToken(), 0);
             // update user attributes;
             updateUser(name, email, phone);
         }
