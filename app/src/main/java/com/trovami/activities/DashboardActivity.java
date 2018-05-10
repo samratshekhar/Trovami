@@ -229,7 +229,11 @@ public class DashboardActivity extends AppCompatActivity
         FirebaseUser currentUser = mAuth.getCurrentUser();
         User user = new User();
         user.email = currentUser.getEmail();
-        user.name = currentUser.getDisplayName();
+        if (currentUser.getDisplayName() != null && !currentUser.getDisplayName().isEmpty()) {
+            user.name = currentUser.getDisplayName();
+        } else {
+            user.name = currentUser.getEmail().split("@")[0];
+        }
         if (currentUser.getPhotoUrl() != null) {
             user.photoUrl = currentUser.getPhotoUrl().toString();
         }
